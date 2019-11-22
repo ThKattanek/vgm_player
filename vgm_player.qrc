@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/vgm">
+        <file alias="vgm_demo">vgm-files/Alex Kidd in Miracle World - 01 - Title Screen.vgm</file>
+    </qresource>
+</RCC>
