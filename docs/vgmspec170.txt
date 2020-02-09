@@ -45,7 +45,7 @@ The format starts with a 256 byte header:
 
 0x00: "Vgm " (0x56 0x67 0x6d 0x20) file identification (32 bits)
 0x04: Eof offset (32 bits)
-        Relative offset to end of file (i.e. file length - 4).
+        Relative offset to end of file (i.e. file lenght - 4).
         This is mainly used to find the next track when concatanating
         player stubs and multiple files.
 0x08: Version number (32 bits)

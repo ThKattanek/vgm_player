@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "./vgmplayer.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,6 +19,7 @@ public:
 private:
     Ui::MainWindow *ui;
 
+    VGMPlayer vgm_player;
     void LogText(const QString text);
 };
 #endif // MAINWINDOW_H
