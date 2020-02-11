@@ -32,6 +32,10 @@ MainWindow::MainWindow(QWidget *parent)
         LogText("- YM2151 Clock: " + QString::number(vgm_player.GetYM2151Clock()) + " Hz");
         LogText("- VGM Data Offset: 0x" + QString::number(vgm_player.GetVGMDataOffset(),16));
     }
+
+    vgm_player.SetPlay(true);
+    for(int i=0; i<177235; i++)
+        vgm_player.GetNextSample();
 }
 
 MainWindow::~MainWindow()

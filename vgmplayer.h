@@ -31,11 +31,17 @@ public:
     uint32_t GetVGMDataOffset();
 
 private:
+    void ExecuteNextStreamCommand();
+
     QFile file;
 
     uint32_t sample_rate;
 
-    bool    is_playing;
+    bool        is_playing;
+    bool        samples_waiting;
+    uint32_t    samples_wait_counter;
+
+    float       current_output_sample;
 
     uint32_t file_ident;
     uint32_t eof_offset;
