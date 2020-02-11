@@ -9,6 +9,9 @@ public:
     VGMPlayer();
     ~VGMPlayer();
     bool Open(QString filename);
+    void SetSampleRate(uint32_t sample_rate);
+    float GetNextSample();
+    void SetPlay(bool playing);
 
     int64_t GetFileSize();
     uint32_t GetEOFOffset();
@@ -29,6 +32,11 @@ public:
 
 private:
     QFile file;
+
+    uint32_t sample_rate;
+
+    bool    is_playing;
+
     uint32_t file_ident;
     uint32_t eof_offset;
     uint32_t version_number;
@@ -48,6 +56,7 @@ private:
 
     uint8_t *streaming_data;
     uint32_t streaming_data_length;
+    uint32_t streaming_pos;
 };
 
 #endif // VGMPLAYER_H

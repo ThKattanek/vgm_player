@@ -2,8 +2,12 @@
 
 VGMPlayer::VGMPlayer()
 {
+    sample_rate = 44100;   // Default 44100
+    is_playing = false;
+
     streaming_data = nullptr;
     streaming_data_length = 0;
+    streaming_pos = 0;
 }
 
 VGMPlayer::~VGMPlayer()
@@ -18,6 +22,9 @@ VGMPlayer::~VGMPlayer()
 bool VGMPlayer::Open(QString filename)
 {
     int64_t nbytes;
+
+    is_playing = false;
+    streaming_pos = 0;
 
     file.setFileName(filename);
 
@@ -115,6 +122,28 @@ bool VGMPlayer::Open(QString filename)
     file.close();
 
     return true;
+}
+
+void VGMPlayer::SetSampleRate(uint32_t sample_rate)
+{
+    this->sample_rate = sample_rate;
+}
+
+float VGMPlayer::GetNextSample()
+{
+    if(is_playing)
+    {
+        return 0.0f;
+    }
+    else
+    {
+        return 0.0f;
+    }
+}
+
+void VGMPlayer::SetPlay(bool playing)
+{
+    this->is_playing = playing;
 }
 
 int64_t VGMPlayer::GetFileSize()
