@@ -2,12 +2,22 @@
 
 VGMPlayer::VGMPlayer()
 {
+    streaming_data = nullptr;
+    streaming_data_length = 0;
+}
 
+VGMPlayer::~VGMPlayer()
+{
+    if(streaming_data == nullptr)
+    {
+        delete [] streaming_data;
+        streaming_data = nullptr;
+    }
 }
 
 bool VGMPlayer::Open(QString filename)
 {
-    int nbytes;
+    int64_t nbytes;
 
     file.setFileName(filename);
 
@@ -27,6 +37,7 @@ bool VGMPlayer::Open(QString filename)
 
     // End Of File Offset
     nbytes = file.read(reinterpret_cast<char*>(&eof_offset), 4);
+    eof_offset += 0x04; // offset from file begin
 
     // Version Number
     nbytes = file.read(reinterpret_cast<char*>(&version_number), 4);
@@ -39,6 +50,7 @@ bool VGMPlayer::Open(QString filename)
 
     // GD3 Tag Offset
     nbytes = file.read(reinterpret_cast<char*>(&gd3_tag_offset), 4);
+    gd3_tag_offset += 0x14; // offset from file begin
 
     // Total Samples
     nbytes = file.read(reinterpret_cast<char*>(&total_samples), 4);
@@ -71,19 +83,41 @@ bool VGMPlayer::Open(QString filename)
     nbytes = file.read(reinterpret_cast<char*>(&vgm_data_offset), 4);
 
     if(vgm_data_offset == 0)
-        vgm_data_offset = 0x40;
+        vgm_data_offset = 0x40;     // offset from file begin
     else
-        vgm_data_offset += 0x34;
+        vgm_data_offset += 0x34;    // offset from file begin
 
     file.seek(vgm_data_offset);
 
+    if(streaming_data == nullptr)
+    {
+        delete [] streaming_data;
+        streaming_data = nullptr;
+    }
+
+    if(gd3_tag_offset == 0)
+    {
+       streaming_data_length = eof_offset - vgm_data_offset;
+    }
+    else
+    {
+        streaming_data_length = gd3_tag_offset - vgm_data_offset;
+    }
+
+    streaming_data = new uint8_t [streaming_data_length];
+
+    // VGM Data Offset
+    nbytes = file.read(reinterpret_cast<char*>(streaming_data), streaming_data_length);
+
+    if(nbytes != streaming_data_length)
+        qDebug() << "Error: failed streaming length.";
 
     file.close();
 
     return true;
 }
 
-int VGMPlayer::GetFileSize()
+int64_t VGMPlayer::GetFileSize()
 {
     return file.size();
 }

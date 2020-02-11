@@ -7,9 +7,10 @@ class VGMPlayer
 {
 public:
     VGMPlayer();
+    ~VGMPlayer();
     bool Open(QString filename);
 
-    int GetFileSize();
+    int64_t GetFileSize();
     uint32_t GetEOFOffset();
     QString GetVersion();
     uint32_t GetSN76489Clock();
@@ -44,6 +45,9 @@ private:
     uint32_t ym2612_clock;
     uint32_t ym2151_clock;
     uint32_t vgm_data_offset;
+
+    uint8_t *streaming_data;
+    uint32_t streaming_data_length;
 };
 
 #endif // VGMPLAYER_H
