@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     vgm_player.SetPlay(true);
-    for(uint32_t i=0; i<vgm_player.GetTotalSamples() + 1; i++)
+    for(uint32_t i=0; i<vgm_player.GetTotalSamples()+1; i++)
         vgm_player.GetNextSample();
 
     LogText("Streaming Pos: " + QString::number(vgm_player.GetStreamingPos()));

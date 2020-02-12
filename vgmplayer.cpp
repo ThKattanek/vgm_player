@@ -139,19 +139,19 @@ float VGMPlayer::GetNextSample()
     {
         if(samples_waiting)
         {
-            sample_counter++;
             samples_wait_counter--;
             if(samples_wait_counter == 0)
                 samples_waiting = false;
         }
         else
         {
-            sample_counter++;
             while(!samples_waiting && is_playing)
             {
                 ExecuteNextStreamCommand();
             }
         }
+
+        sample_counter++;
         return current_output_sample;
     }
     else
