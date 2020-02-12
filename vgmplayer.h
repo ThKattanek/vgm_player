@@ -29,6 +29,8 @@ public:
     uint32_t GetYM2612Clock();
     uint32_t GetYM2151Clock();
     uint32_t GetVGMDataOffset();
+    uint32_t GetCurrentSamplesCount();
+    uint32_t GetStreamingPos();
 
 private:
     void ExecuteNextStreamCommand();
@@ -42,6 +44,8 @@ private:
     uint32_t    samples_wait_counter;
 
     float       current_output_sample;
+
+    uint32_t    sample_counter;
 
     uint32_t file_ident;
     uint32_t eof_offset;

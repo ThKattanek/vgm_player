@@ -139,16 +139,20 @@ float VGMPlayer::GetNextSample()
     {
         if(samples_waiting)
         {
+            sample_counter++;
             samples_wait_counter--;
             if(samples_wait_counter == 0)
                 samples_waiting = false;
-            return current_output_sample;
         }
         else
         {
-            ExecuteNextStreamCommand();
-            return current_output_sample;
+            sample_counter++;
+            while(!samples_waiting && is_playing)
+            {
+                ExecuteNextStreamCommand();
+            }
         }
+        return current_output_sample;
     }
     else
     {
@@ -159,6 +163,11 @@ float VGMPlayer::GetNextSample()
 void VGMPlayer::SetPlay(bool playing)
 {
     this->is_playing = playing;
+
+    if(is_playing)
+    {
+        sample_counter = 0;
+    }
 }
 
 int64_t VGMPlayer::GetFileSize()
@@ -247,6 +256,16 @@ uint32_t VGMPlayer::GetVGMDataOffset()
     return vgm_data_offset;
 }
 
+uint32_t VGMPlayer::GetCurrentSamplesCount()
+{
+    return sample_counter;
+}
+
+uint32_t VGMPlayer::GetStreamingPos()
+{
+    return streaming_pos;
+}
+
 void VGMPlayer::ExecuteNextStreamCommand()
 {
     uint8_t command = streaming_data[streaming_pos++];
@@ -330,6 +349,7 @@ void VGMPlayer::ExecuteNextStreamCommand()
         value16 |= (uint16_t)streaming_data[streaming_pos];
         samples_waiting = true;
         samples_wait_counter = value16;
+        samples_wait_counter--;
         streaming_pos += 2;
         qDebug() << "0x61 - Wait" << value16 << "Samples";
         break;
@@ -337,12 +357,14 @@ void VGMPlayer::ExecuteNextStreamCommand()
     case 0x62:
         samples_waiting = true;
         samples_wait_counter = 735;
+        samples_wait_counter--;
         qDebug() << "0x62 - Wait 735 Samples";
         break;
     // 0x63       : wait 882 samples (50th of a second), a shortcut for 0x61 0x72 0x03
     case 0x63:
         samples_waiting = true;
         samples_wait_counter = 882;
+        samples_wait_counter--;
         qDebug() << "0x63 - Wait 882 Samples";
         break;
     // 0x64 cc nn nn : override length of 0x62/0x63 cc - command (0x62/0x63) nn - delay in samples
@@ -352,8 +374,8 @@ void VGMPlayer::ExecuteNextStreamCommand()
         break;
     // 0x66       : end of sound data
     case 0x66:
-        streaming_pos = 0;
-        qDebug() << "Stream End - Goto Stram Start";
+        is_playing = false;
+        qDebug() << "Stream End";
         break;
     // 0x67 ...   : data block: see below
     case 0x67:
