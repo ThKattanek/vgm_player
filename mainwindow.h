@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <SDL2/SDL.h>
 #include "./vgmplayer.h"
 
 QT_BEGIN_NAMESPACE
@@ -15,11 +16,24 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void FillAudioBuffer(uint8_t *stream, int size);
 
 private:
     Ui::MainWindow *ui;
 
     VGMPlayer vgm_player;
     void LogText(const QString text);
+    void InitSDLAudio();
+
+
+    SDL_AudioSpec   audio_spec_want;
+    SDL_AudioSpec   audio_spec_have;
+
+    uint16_t        audio_sample_bit_size;
+    uint16_t        audio_channels;
+    bool            is_audio_sample_little_endian;
+    bool            is_audio_sample_float;
+    bool            is_audio_sample_signed;
+
 };
 #endif // MAINWINDOW_H
