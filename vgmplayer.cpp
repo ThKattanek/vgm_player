@@ -345,8 +345,8 @@ void VGMPlayer::ExecuteNextStreamCommand()
     // 0x61 nn nn : Wait n samples, n can range from 0 to 65535 (approx 1.49 seconds).
     //              Longer pauses than this are represented by multiple wait commands.
     case 0x61:
-        value16 = (uint16_t)streaming_data[streaming_pos+1] << 8;
-        value16 |= (uint16_t)streaming_data[streaming_pos];
+        value16 = static_cast<uint16_t>(streaming_data[streaming_pos+1] << 8);
+        value16 |= static_cast<uint16_t>(streaming_data[streaming_pos]);
         samples_waiting = true;
         samples_wait_counter = value16;
         samples_wait_counter--;

@@ -49,6 +49,9 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    SDL_PauseAudio(1);
+    SDL_CloseAudio();
+
     delete ui;
 }
 
@@ -135,7 +138,7 @@ void MainWindow::InitSDLAudio()
 
 void MainWindow::FillAudioBuffer(uint8_t *stream, int size)
 {
-    float *buffer = (float*)stream;
+    float *buffer = reinterpret_cast<float*>(stream);
 
     if((audio_sample_bit_size == 32) && is_audio_sample_float)
     {
