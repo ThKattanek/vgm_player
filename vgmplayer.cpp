@@ -14,7 +14,7 @@
 
 VGMPlayer::VGMPlayer()
 {
-    sample_rate = 44100;   // Default 44100
+    SetSampleRate(44100);   // Default 44100
 
     is_playing = false;
     samples_waiting = false;
@@ -137,12 +137,16 @@ bool VGMPlayer::Open(QString filename)
 
     file.close();
 
+    InitSN76489();
+
     return true;
 }
 
-void VGMPlayer::SetSampleRate(uint32_t sample_rate)
+void VGMPlayer::SetSampleRate(uint32_t samplerate)
 {
-    this->sample_rate = sample_rate;
+    this->samplerate = samplerate;
+
+    sn76489.SetSampleRate(samplerate);
 }
 
 float VGMPlayer::GetNextSample()
@@ -164,6 +168,9 @@ float VGMPlayer::GetNextSample()
         }
 
         sample_counter++;
+
+        current_output_sample = sn76489.GetNextSample();
+
         return current_output_sample;
     }
     else
@@ -292,6 +299,7 @@ void VGMPlayer::ExecuteNextStreamCommand()
         break;
     // 0x50 dd    : PSG (SN76489/SN76496) write value dd
     case 0x50:
+        sn76489.WriteReg(streaming_data[streaming_pos]);
         streaming_pos += 1;
         break;
     // 0x51 aa dd : YM2413, write value dd to register aa
@@ -520,4 +528,9 @@ void VGMPlayer::ExecuteNextStreamCommand()
     default:
         break;
     }
+}
+
+void VGMPlayer::InitSN76489()
+{
+    sn76489.SetClockSpeed(sn76489_clock);
 }

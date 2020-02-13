@@ -14,6 +14,7 @@
 #define VGMPLAYER_H
 
 #include <QtCore>
+#include "./sn76489_class.h"
 
 class VGMPlayer
 {
@@ -21,7 +22,7 @@ public:
     VGMPlayer();
     ~VGMPlayer();
     bool Open(QString filename);
-    void SetSampleRate(uint32_t sample_rate);
+    void SetSampleRate(uint32_t samplerate);
     float GetNextSample();
     void SetPlay(bool playing);
 
@@ -46,10 +47,11 @@ public:
 
 private:
     void ExecuteNextStreamCommand();
+    void InitSN76489();
 
     QFile file;
 
-    uint32_t sample_rate;
+    uint32_t samplerate;
 
     bool        is_playing;
     bool        samples_waiting;
@@ -79,6 +81,8 @@ private:
     uint8_t *streaming_data;
     uint32_t streaming_data_length;
     uint32_t streaming_pos;
+
+    SN76489Class sn76489;
 };
 
 #endif // VGMPLAYER_H
