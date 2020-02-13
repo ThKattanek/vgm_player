@@ -1,3 +1,15 @@
+//////////////////////////////////////////////////
+//                                              //
+// VGM Player with QT                           //
+// by thorsten kattanek                         //
+//                                              //
+// #file: mainwindow.h                          //
+//                                              //
+// last changes at 02-13-2020                   //
+// https://github.com/ThKattanek/vgm_player     //
+//                                              //
+//////////////////////////////////////////////////
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 

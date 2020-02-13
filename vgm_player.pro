@@ -21,10 +21,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    sn76489_class.cpp \
     vgmplayer.cpp
 
 HEADERS += \
     mainwindow.h \
+    sn76489_class.h \
     vgmplayer.h
 
 FORMS += \
