@@ -5,7 +5,7 @@
 //                                              //
 // #file: sn76489_class.h                       //
 //                                              //
-// last changes at 02-13-2020                   //
+// last changes at 02-14-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -30,14 +30,19 @@ public:
 
 private:
     void CalcSubCounter();
+    void CalcAddNoiseCounter();
+    void StepNoiseGerator();
 
-    uint32_t clockspeed;    // as Hz
-    uint32_t samplerate;    // as Hz
-    uint16_t sub_counter;
+    uint32_t clockspeed;        // as Hz
+    uint32_t samplerate;        // as Hz
+    uint16_t sub_counter_tone;
+    float add_counter_noise;
 
     int16_t tone1_counter;
     int16_t tone2_counter;
     int16_t tone3_counter;
+
+    float noise_counter;
 
     uint16_t tone1_freq;
     uint16_t tone2_freq;
@@ -46,11 +51,16 @@ private:
     float   tone1_output;
     float   tone2_output;
     float   tone3_output;
+    float   noise_output;
 
     float   tone1_attenuation;
     float   tone2_attenuation;
     float   tone3_attenuation;
     float   noise_attenuation;
+
+    uint16_t shift_reg;
+    bool     white_noise;
+    uint8_t  noise_freq;
 
     uint16_t freq_latch;
     uint8_t is_wait_second_byte;   // 0=no / 1=yes - tone1 / 2=yes - tone2 / 3=yes - tone3

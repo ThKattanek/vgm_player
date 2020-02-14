@@ -386,21 +386,18 @@ void VGMPlayer::ExecuteNextStreamCommand()
         samples_wait_counter = value16;
         samples_wait_counter--;
         streaming_pos += 2;
-        qDebug() << "0x61 - Wait" << value16 << "Samples";
         break;
     // 0x62       : wait 735 samples (60th of a second), a shortcut for 0x61 0xdf 0x02
     case 0x62:
         samples_waiting = true;
         samples_wait_counter = 735;
         samples_wait_counter--;
-        qDebug() << "0x62 - Wait 735 Samples";
         break;
     // 0x63       : wait 882 samples (50th of a second), a shortcut for 0x61 0x72 0x03
     case 0x63:
         samples_waiting = true;
         samples_wait_counter = 882;
         samples_wait_counter--;
-        qDebug() << "0x63 - Wait 882 Samples";
         break;
     // 0x64 cc nn nn : override length of 0x62/0x63 cc - command (0x62/0x63) nn - delay in samples
     //                 [Note: Not yet implemented. Am I really sure about this?]
@@ -411,7 +408,6 @@ void VGMPlayer::ExecuteNextStreamCommand()
     // 0x66       : end of sound data
     case 0x66:
         is_playing = false;
-        qDebug() << "Stream End";
         break;
     // 0x67 ...   : data block: see below
     case 0x67:

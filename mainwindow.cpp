@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     InitSDLAudio();
 
-    if(!vgm_player.Open(":/vgm/vgm_demo1"))
+    if(!vgm_player.Open(":/vgm/vgm_demo11"))
     {
         LogText("- Fehler beim öffnen der Demo VGM Datei.");
     }
