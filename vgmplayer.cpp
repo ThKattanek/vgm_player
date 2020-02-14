@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.cpp                         //
 //                                              //
-// last changes at 02-13-2020                   //
+// last changes at 02-14-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -296,6 +296,7 @@ void VGMPlayer::ExecuteNextStreamCommand()
     // 0x4F dd    : Game Gear PSG stereo, write dd to port 0x06
     case 0x4f:
         streaming_pos += 1;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x50 dd    : PSG (SN76489/SN76496) write value dd
     case 0x50:
@@ -305,14 +306,17 @@ void VGMPlayer::ExecuteNextStreamCommand()
     // 0x51 aa dd : YM2413, write value dd to register aa
     case 0x51:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x52 aa dd : YM2612 port 0, write value dd to register aa
     case 0x52:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x53 aa dd : YM2612 port 1, write value dd to register aa
     case 0x53:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x54 aa dd : YM2151, write value dd to register aa
     case 0x54:
@@ -321,46 +325,57 @@ void VGMPlayer::ExecuteNextStreamCommand()
     // 0x55 aa dd : YM2203, write value dd to register aa
     case 0x55:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x56 aa dd : YM2608 port 0, write value dd to register aa
     case 0x56:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x57 aa dd : YM2608 port 1, write value dd to register aa
     case 0x57:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x58 aa dd : YM2610 port 0, write value dd to register aa
     case 0x58:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x59 aa dd : YM2610 port 1, write value dd to register aa
     case 0x59:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x5A aa dd : YM3812, write value dd to register aa
     case 0x5a:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x5B aa dd : YM3526, write value dd to register aa
     case 0x5b:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x5C aa dd : Y8950, write value dd to register aa
     case 0x5c:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x5D aa dd : YMZ280B, write value dd to register aa
     case 0x5d:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x5E aa dd : YMF262 port 0, write value dd to register aa
     case 0x5e:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x5F aa dd : YMF262 port 1, write value dd to register aa
     case 0x5f:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x61 nn nn : Wait n samples, n can range from 0 to 65535 (approx 1.49 seconds).
     //              Longer pauses than this are represented by multiple wait commands.
@@ -391,6 +406,7 @@ void VGMPlayer::ExecuteNextStreamCommand()
     //                 [Note: Not yet implemented. Am I really sure about this?]
     case 0x64:
         streaming_pos += 3;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x66       : end of sound data
     case 0x66:
@@ -400,10 +416,12 @@ void VGMPlayer::ExecuteNextStreamCommand()
     // 0x67 ...   : data block: see below
     case 0x67:
         qDebug() << "Data Block";
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x68 ...   : PCM RAM write: see below
     case 0x68:
         qDebug() << "PCM RAM Write";
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x7n       : wait n+1 samples, n can range from 0 to 15.
     case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77: case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
@@ -411,9 +429,11 @@ void VGMPlayer::ExecuteNextStreamCommand()
         samples_waiting = true;
         samples_wait_counter = value8;
         qDebug() << "0x7n - Wait" << value8 << "Samples";
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x8n       : YM2612 port 0 address 2A write from the data bank, then wait n samples; n can range from 0 to 15. Note that the wait is n, NOT n+1. (Note: Written to first chip instance only.)
     case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87: case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x90-0x95  : DAC Stream Control Write: see below
     case 0x90:
@@ -428,104 +448,130 @@ void VGMPlayer::ExecuteNextStreamCommand()
 
     case 0x95:
         qDebug() << "DAC Stream Control Write:";
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xA0 aa dd : AY8910, write value dd to register aa
     case 0xa0:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xB0 aa dd : RF5C68, write value dd to register aa
     case 0xb0:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xB1 aa dd : RF5C164, write value dd to register aa
     case 0xb1:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xB2 ad dd : PWM, write value ddd to register a (d is MSB, dd is LSB)
     case 0xb2:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xB3 aa dd : GameBoy DMG, write value dd to register aa
     case 0xb3:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xB4 aa dd : NES APU, write value dd to register aa
     case 0xb4:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xB5 aa dd : MultiPCM, write value dd to register aa
     case 0xb5:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xB6 aa dd : uPD7759, write value dd to register aa
     case 0xb6:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xB7 aa dd : OKIM6258, write value dd to register aa
     case 0xb7:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xB8 aa dd : OKIM6295, write value dd to register aa
     case 0xb8:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xB9 aa dd : HuC6280, write value dd to register aa
     case 0xb9:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xBA aa dd : K053260, write value dd to register aa
     case 0xba:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xBB aa dd : Pokey, write value dd to register aa
     case 0xbb:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xC0 aaaa dd : Sega PCM, write value dd to memory offset aaaa
     case 0xc0:
         streaming_pos += 3;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xC1 aaaa dd : RF5C68, write value dd to memory offset aaaa
     case 0xc1:
         streaming_pos += 3;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xC2 aaaa dd : RF5C164, write value dd to memory offset aaaa
     case 0xc2:
         streaming_pos += 3;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xC3 cc aaaa : MultiPCM, write set bank offset aaaa to channel cc
     case 0xc3:
         streaming_pos += 3;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xC4 mmll rr : QSound, write value mmll to register rr (mm - data MSB, ll - data LSB)
     case 0xc4:
         streaming_pos += 3;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xD0 pp aa dd : YMF278B port pp, write value dd to register aa
     case 0xd0:
         streaming_pos += 3;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xD1 pp aa dd : YMF271 port pp, write value dd to register aa
     case 0xd1:
         streaming_pos += 3;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xD2 pp aa dd : SCC1 port pp, write value dd to register aa
     case 0xd2:
         streaming_pos += 3;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xD3 pp aa dd : K054539 write value dd to register ppaa
     case 0xd3:
         streaming_pos += 3;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xD4 pp aa dd : C140 write value dd to register ppaa
     case 0xd4:
         streaming_pos += 3;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xE0 dddddddd : seek to offset dddddddd (Intel byte order) in PCM data bank
     case 0xe0:
         streaming_pos += 4;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     default:
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     }
 }

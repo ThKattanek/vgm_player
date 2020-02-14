@@ -5,7 +5,7 @@
 //                                              //
 // #file: mainwindow.cpp                        //
 //                                              //
-// last changes at 02-13-2020                   //
+// last changes at 02-14-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     InitSDLAudio();
 
-    if(!vgm_player.Open(":/vgm/vgm_demo2"))
+    if(!vgm_player.Open(":/vgm/vgm_demo1"))
     {
         LogText("- Fehler beim öffnen der Demo VGM Datei.");
     }
