@@ -15,6 +15,8 @@
 
 #include <cstdint>
 
+static const float volume_table[16]={1.0f, 0.7943f, 0.631f, 0.5012f, 0.3981f, 0.3162f, 0.2512f, 0.2004f, 0.1585f, 0.1259f, 0.1f, 0.0794f, 0.0634f, 0.0501f, 0.0398f, 0.f};
+
 class SN76489Class
 {
 public:
@@ -44,6 +46,11 @@ private:
     float   tone1_output;
     float   tone2_output;
     float   tone3_output;
+
+    float   tone1_attenuation;
+    float   tone2_attenuation;
+    float   tone3_attenuation;
+    float   noise_attenuation;
 
     uint16_t freq_latch;
     uint8_t is_wait_second_byte;   // 0=no / 1=yes - tone1 / 2=yes - tone2 / 3=yes - tone3

@@ -25,6 +25,10 @@ SN76489Class::SN76489Class()
     tone2_freq = 0;
     tone3_freq = 0;
 
+    tone1_attenuation = 0.0f;
+    tone2_attenuation = 0.0f;
+    tone3_attenuation = 0.0f;
+
     is_wait_second_byte = 0;
 }
 
@@ -54,18 +58,21 @@ void SN76489Class::WriteReg(uint8_t value)
         is_wait_second_byte = 1;
         break;
     case 0x90:  // Tone 1 Attenuation
+        tone1_attenuation = volume_table[value & 0x0f];
         break;
     case 0xa0:  // Tone 2 Frequency first byte
         freq_latch = value & 0x0f;
         is_wait_second_byte = 2;
         break;
     case 0xb0:  // Tone 2 Attenuation
+        tone2_attenuation = volume_table[value & 0x0f];
         break;
     case 0xc0:  // Tone 3 Frequency first byte
         freq_latch = value & 0x0f;
         is_wait_second_byte = 3;
         break;
     case 0xd0:  // Tone 3 Attenuation
+        tone3_attenuation = volume_table[value & 0x0f];
         break;
     case 0xe0:  // Noise Control
         break;
@@ -115,7 +122,7 @@ float SN76489Class::GetNextSample()
         tone3_output *= -1.0f;
     }
 
-    return  tone1_output + tone2_output + tone3_output;
+    return  tone1_output * tone1_attenuation + tone2_output * tone2_attenuation + tone3_output * tone3_attenuation;
 }
 
 void SN76489Class::CalcSubCounter()
