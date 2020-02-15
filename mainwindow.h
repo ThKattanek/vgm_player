@@ -5,7 +5,7 @@
 //                                              //
 // #file: mainwindow.h                          //
 //                                              //
-// last changes at 02-13-2020                   //
+// last changes at 02-15-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -14,6 +14,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QFileDialog>
 #include <SDL2/SDL.h>
 #include "./vgmplayer.h"
 
@@ -29,6 +30,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void FillAudioBuffer(uint8_t *stream, int size);
+
+private slots:
+    void on_actionOpen_triggered();
 
 private:
     Ui::MainWindow *ui;

@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.h                           //
 //                                              //
-// last changes at 02-13-2020                   //
+// last changes at 02-15-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -14,6 +14,7 @@
 #define VGMPLAYER_H
 
 #include <QtCore>
+#include "zlib.h"
 #include "./sn76489_class.h"
 
 class VGMPlayer
@@ -49,7 +50,8 @@ private:
     void ExecuteNextStreamCommand();
     void InitSN76489();
 
-    QFile file;
+    QFile   file;
+    bool    is_file_open;
 
     uint32_t samplerate;
 

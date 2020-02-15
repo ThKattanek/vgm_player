@@ -1,15 +1,1 @@
-<RCC>
-    <qresource prefix="/vgm">
-        <file alias="vgm_demo1">vgm-files/Alex Kidd in Miracle World - 01 - Title Screen.vgm</file>
-        <file alias="vgm_demo11">vgm-files/Sonic The Hedgehog - 01 - Title Screen.vgm</file>
-        <file alias="vgm_demo2">vgm-files/Alex Kidd in Miracle World - 02 - Level Start.vgm</file>
-        <file alias="vgm_demo3">vgm-files/Alex Kidd in Miracle World - 03 - Main Theme.vgm</file>
-        <file alias="vgm_demo4">vgm-files/Alex Kidd in Miracle World - 04 - Underwater.vgm</file>
-        <file alias="vgm_demo5">vgm-files/Alex Kidd in Miracle World - 05 - Sukopako Motorcycle.vgm</file>
-        <file alias="vgm_demo6">vgm-files/Alex Kidd in Miracle World - 06 - Janken.vgm</file>
-        <file alias="vgm_demo7">vgm-files/Alex Kidd in Miracle World - 07 - Peticopter.vgm</file>
-        <file alias="vgm_demo8">vgm-files/Alex Kidd in Miracle World - 08 - Castle.vgm</file>
-        <file alias="vgm_demo9">vgm-files/Alex Kidd in Miracle World - 09 - Ending.vgm</file>
-        <file alias="vgm_demo10">vgm-files/Alex Kidd in Miracle World - 10 - Game Over.vgm</file>
-    </qresource>
-</RCC>
+<RCC/>

@@ -5,7 +5,7 @@
 //                                              //
 // #file: sn76489_class.cpp                     //
 //                                              //
-// last changes at 02-14-2020                   //
+// last changes at 02-15-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////

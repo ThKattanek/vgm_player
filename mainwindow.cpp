@@ -5,7 +5,7 @@
 //                                              //
 // #file: mainwindow.cpp                        //
 //                                              //
-// last changes at 02-14-2020                   //
+// last changes at 02-15-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -32,7 +32,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     InitSDLAudio();
 
-    if(!vgm_player.Open(":/vgm/vgm_demo11"))
+    /*
+    if(!vgm_player.Open(":/vgm/vgm_demo13"))
     {
         LogText("- Fehler beim öffnen der Demo VGM Datei.");
     }
@@ -57,6 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     vgm_player.SetPlay(true);
+    */
 }
 
 MainWindow::~MainWindow()
@@ -161,4 +163,13 @@ void MainWindow::FillAudioBuffer(uint8_t *stream, int size)
             buffer[i+1] = sample;
         }
     }
+}
+
+void MainWindow::on_actionOpen_triggered()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),0, tr("Video Game Music Files (*.vgm; *.vgz) (*.vgm *.vgz)"));
+
+    vgm_player.SetPlay(false);
+    vgm_player.Open(fileName);
+    vgm_player.SetPlay(true);
 }

@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.cpp                         //
 //                                              //
-// last changes at 02-14-2020                   //
+// last changes at 02-15-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,6 +16,7 @@ VGMPlayer::VGMPlayer()
 {
     SetSampleRate(44100);   // Default 44100
 
+    is_file_open = false;
     is_playing = false;
     samples_waiting = false;
 
@@ -46,6 +47,7 @@ bool VGMPlayer::Open(QString filename)
 
     if(!file.open(QIODevice::ReadOnly))
     {
+        is_file_open = false;
         return false;
     }
 
@@ -55,6 +57,7 @@ bool VGMPlayer::Open(QString filename)
     // "Vgm "
     if((file_ident != 0x206d6756) && (nbytes == 4))
     {
+        is_file_open = false;
         return false;
     }
 
@@ -139,6 +142,7 @@ bool VGMPlayer::Open(QString filename)
 
     InitSN76489();
 
+    is_file_open = true;
     return true;
 }
 
@@ -181,11 +185,14 @@ float VGMPlayer::GetNextSample()
 
 void VGMPlayer::SetPlay(bool playing)
 {
-    this->is_playing = playing;
-
-    if(is_playing)
+    if(is_file_open)
     {
-        sample_counter = 0;
+        this->is_playing = playing;
+
+        if(is_playing)
+        {
+            sample_counter = 0;
+        }
     }
 }
 
@@ -424,8 +431,6 @@ void VGMPlayer::ExecuteNextStreamCommand()
         value8 = (streaming_data[streaming_pos] & 0x0f) + 1;
         samples_waiting = true;
         samples_wait_counter = value8;
-        qDebug() << "0x7n - Wait" << value8 << "Samples";
-        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x8n       : YM2612 port 0 address 2A write from the data bank, then wait n samples; n can range from 0 to 15. Note that the wait is n, NOT n+1. (Note: Written to first chip instance only.)
     case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87: case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
