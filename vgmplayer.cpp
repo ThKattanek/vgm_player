@@ -58,6 +58,7 @@ bool VGMPlayer::Open(QString filename)
     if((file_ident != 0x206d6756) && (nbytes == 4))
     {
         is_file_open = false;
+        file.close();
         return false;
     }
 
