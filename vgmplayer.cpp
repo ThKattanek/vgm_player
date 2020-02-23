@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.cpp                         //
 //                                              //
-// last changes at 02-15-2020                   //
+// last changes at 02-23-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -48,6 +48,24 @@ bool VGMPlayer::Open(QString filename)
     if(!file.open(QIODevice::ReadOnly))
     {
         is_file_open = false;
+        return false;
+    }
+
+
+    // File check for gzip compression
+    uint16_t gzip_id;
+    nbytes = file.read(reinterpret_cast<char*>(&gzip_id), 2);
+    if(nbytes == 2)
+    {
+        if(gzip_id == 0x8b1f)
+        {
+            qDebug() << "This file is with gzip compressed";
+        }
+        else file.seek(0);
+    }
+    else
+    {
+        // this File is too small
         return false;
     }
 
