@@ -11,6 +11,7 @@
 //////////////////////////////////////////////////
 
 #include "vgmplayer.h"
+#include "./gunzip.h"
 
 VGMPlayer::VGMPlayer()
 {
@@ -38,6 +39,11 @@ bool VGMPlayer::Open(QString filename)
 {
     int64_t nbytes;
 
+    // for gzip
+    unsigned char *window;
+    z_stream strm;
+    QString temp_filename;
+
     is_playing = false;
     samples_waiting = false;
 
@@ -54,12 +60,37 @@ bool VGMPlayer::Open(QString filename)
 
     // File check for gzip compression
     uint16_t gzip_id;
+    int ret;
+
+    bool is_compressed = false;
+
     nbytes = file.read(reinterpret_cast<char*>(&gzip_id), 2);
     if(nbytes == 2)
     {
         if(gzip_id == 0x8b1f)
         {
-            qDebug() << "This file is with gzip compressed";
+            file.close();
+
+            is_compressed = true;
+
+            /* initialize inflateBack state for repeated use */
+            window = match;                         /* reuse LZW match buffer */
+            strm.zalloc = Z_NULL;
+            strm.zfree = Z_NULL;
+            strm.opaque = Z_NULL;
+            ret = inflateBackInit(&strm, 15, window);
+
+            if (ret != Z_OK)
+            {
+                fprintf(stderr, "gunzip out of memory error--aborting\n");
+                return false;
+            }
+
+            temp_filename = QDir::tempPath() + "/vgmplayer.tmp";
+
+            ret = gunzip(&strm, filename.toUtf8().data(), temp_filename.toUtf8().data(), 0);
+
+            inflateBackEnd(&strm);
         }
         else file.seek(0);
     }
@@ -67,6 +98,17 @@ bool VGMPlayer::Open(QString filename)
     {
         // this File is too small
         return false;
+    }
+
+    if(is_compressed)
+    {
+        // temporary file open
+        file.setFileName(temp_filename);
+        if(!file.open(QIODevice::ReadOnly))
+        {
+            is_file_open = false;
+            return false;
+        }
     }
 
     nbytes = file.read(reinterpret_cast<char*>(&file_ident), 4);
@@ -158,6 +200,12 @@ bool VGMPlayer::Open(QString filename)
         qDebug() << "Error: failed streaming length.";
 
     file.close();
+
+    if(is_compressed)
+    {
+        // temporary file delete
+        file.remove();
+    }
 
     InitSN76489();
 
