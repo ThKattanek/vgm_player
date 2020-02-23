@@ -28,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    this->setWindowTitle("VGM Player - by Thorsten Kattanek");
+
     LogText("VGM Player - by Thorsten Kattanek\n");
 
     InitSDLAudio();

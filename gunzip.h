@@ -530,7 +530,9 @@ local void copymeta(char *from, char *to)
     (void)chmod(to, was.st_mode & 07777);
 
     /* copy owner's user and group, ignore errors */
+#ifdef __linux__
     (void)chown(to, was.st_uid, was.st_gid);
+#endif
 
     /* copy access and modify times, ignore errors */
     when.actime = was.st_atime;
