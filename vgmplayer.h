@@ -22,9 +22,12 @@ public:
     VGMPlayer();
     ~VGMPlayer();
     bool Open(QString filename);
+    bool isOpen();
     void SetSampleRate(uint32_t samplerate);
     float GetNextSample();
     void SetPlay(bool playing);
+
+    bool ExportStreamingData(QString filename);
 
     int64_t GetFileSize();
     uint32_t GetEOFOffset();

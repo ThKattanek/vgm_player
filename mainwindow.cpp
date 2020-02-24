@@ -175,3 +175,22 @@ void MainWindow::on_actionOpen_triggered()
     vgm_player.Open(fileName);
     vgm_player.SetPlay(true);
 }
+
+void MainWindow::on_actionE_xit_triggered()
+{
+    this->close();
+}
+
+void MainWindow::on_action_Export_Streaming_Data_triggered()
+{
+    if(vgm_player.isOpen())
+    {
+        QString filename = QFileDialog::getSaveFileName(this, tr("Save Streaming Data"),0, tr("RAW VGM Streaming Data (*.raw) (*.raw)"));
+        if(filename != "")
+        {
+            vgm_player.ExportStreamingData(filename);
+        }
+    }
+    else
+        QMessageBox::information(this,tr("VGM Player Info"),tr("VGM File is not open!"));
+}

@@ -213,6 +213,11 @@ bool VGMPlayer::Open(QString filename)
     return true;
 }
 
+bool VGMPlayer::isOpen()
+{
+    return is_file_open;
+}
+
 void VGMPlayer::SetSampleRate(uint32_t samplerate)
 {
     this->samplerate = samplerate;
@@ -261,6 +266,27 @@ void VGMPlayer::SetPlay(bool playing)
             sample_counter = 0;
         }
     }
+}
+
+bool VGMPlayer::ExportStreamingData(QString filename)
+{
+    QFile file;
+
+    file.setFileName(filename);
+
+    if(!file.open(QIODevice::WriteOnly))
+    {
+        qDebug() << "Could not open file!";
+        return false;
+    }
+
+    int ret = file.write((const char*)(streaming_data), streaming_data_length);
+    file.close();
+
+    if(ret == -1)
+        return  false;
+
+    return true;
 }
 
 int64_t VGMPlayer::GetFileSize()

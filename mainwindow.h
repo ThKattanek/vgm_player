@@ -15,6 +15,7 @@
 
 #include <QMainWindow>
 #include <QFileDialog>
+#include <QMessageBox>
 #include <SDL2/SDL.h>
 #include "./vgmplayer.h"
 
@@ -33,6 +34,10 @@ public:
 
 private slots:
     void on_actionOpen_triggered();
+
+    void on_actionE_xit_triggered();
+
+    void on_action_Export_Streaming_Data_triggered();
 
 private:
     Ui::MainWindow *ui;
