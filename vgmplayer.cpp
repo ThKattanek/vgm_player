@@ -421,6 +421,7 @@ void VGMPlayer::ExecuteNextStreamCommand()
     // 0x54 aa dd : YM2151, write value dd to register aa
     case 0x54:
         streaming_pos += 2;
+        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0x55 aa dd : YM2203, write value dd to register aa
     case 0x55:
