@@ -522,7 +522,7 @@ void VGMPlayer::ExecuteNextStreamCommand()
         break;
     // 0x7n       : wait n+1 samples, n can range from 0 to 15.
     case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77: case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-        value8 = (streaming_data[streaming_pos] & 0x0f) + 1;
+        value8 = (command & 0x0f) + 1;
         samples_waiting = true;
         samples_wait_counter = value8;
         break;
