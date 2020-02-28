@@ -1,0 +1,90 @@
+***********************************************
+* Megadrive VGM music package                 *
+* http://project2612.org                      *
+***********************************************
+
+Game name:           Sonic & Knuckles
+System:              Sega Genesis
+Complete music dump: Yes
+
+Original authors:    Tatsuyuki Maeda,
+                     Tomonori Sawada,
+                     Sachio Ogawa,
+                     Masayuki Nagao,
+                     Masanori Hikichi,
+                     Jun Senoue,
+                     Howard Drossin,
+                     Masaru Setusmaru,
+                     Yukifumi Makino,
+                     Yoshiaki Kashima
+                    
+Publisher:           Sega
+Package created by:  Dark Pulse, Hendricks266,
+                     LittleMichaelz, dissident93
+                     Valley Bell
+Package version:     1.00
+
+Files, in approximate game order:
+
+Name                                    Length:
+                                        Total  Loop
+01. Title Screen                        0:17   -
+02. Knuckles' Theme                     0:16   0:15
+03. Mushroom Hill Zone 1                0:45   0:42
+04. Mushroom Hill Zone 2                0:42   0:39
+05. Flying Battery Zone 1               0:41   0:40
+06. Flying Battery Zone 2               0:41   0:40
+07. Sandopolis Zone 1                   0:49   0:41
+08. Sandopolis Zone 2                   0:51   0:43
+09. Lava Reef Zone 1                    0:39   0:37
+10. Lava Reef Zone 2                    0:53   0:40
+11. Sky Sanctuary Zone                  1:01   0:58
+12. Death Egg Zone 1                    0:41   0:39
+13. Death Egg Zone 2                    0:38   0:38
+14. The Doomsday Zone                   1:02   0:49
+15. Bonus Stage 1 (Magnetic Orbs)       0:52   0:49
+16. Bonus Stage 2 (Slot Machine)        0:51   0:43
+17. Special Stage (Blue Spheres)        1:10   1:03
+18. Act Complete                        0:04   -
+19. Miniboss                            0:27   0:25
+20. Robotnik                            0:32   0:32
+21. No Way!                             0:40   0:40
+22. Staff Roll                          2:49   -
+23. Game Complete                       0:10   -
+24. Invincibility                       0:12   0:11
+25. 1-up                                0:03   -
+26. Drowning                            0:10   -
+27. Game Over                           0:08   -
+28. Continue                            0:04
+29. Chaos Emerald                       0:03   -
+30. All Chaos Emeralds                  0:02   -
+31. Title Screen (Beta)                 0:19   -
+32. Game Complete (Beta)                0:10   -
+
+Notes:
+
+This set was previously apart of a set which included
+songs from Sonic 3. It was cluttered and disorganized
+so I decided to split them into two sets. I've also
+added a few re-logged songs (No Way!) and
+renamed many of them.
+-dissident93
+
+Here are the update notes from the previous mega-set:
+
+2.00: Added all the beta-songs and reordered S3K/S3-
+song to be S3, S3K-Beta, S&K. -Valley Bell
+
+1.26: Fixed "Chrome Gadget." Thanks go to 
+brother-ernest on the forums.
+
+1.25: Added the Composers in, replacing "Sega Sound 
+Team" and added their proper Kanji, with the 
+obvious exception of Drossin. Still looking for 
+per-track authors if possible... if you know 
+exactly who composed what song(s), please get a hold 
+of me!
+
+1.10: Fixed versions of Knuckles' Theme (Sonic 3
+version) and the Sonic 3 Credits, courtesy of
+MattMan0.

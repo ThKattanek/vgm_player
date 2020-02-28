@@ -1,0 +1,81 @@
+***********************************************
+* Megadrive VGM music package                 *
+* http://project2612.org/                     *
+***********************************************
+
+Game name:           Sega Channel Demo
+                      Cartridge #4
+System:              Sega Mega Drive / Genesis
+Complete music dump: Yes
+
+Original author:     John Baker
+Publisher:           Sega
+Package created by:  Valley Bell
+Package version:     1.00
+
+Files, in approximate game order:
+
+Name                                Length:
+                                    Total  Loop
+01 Splash Screen 1                  0:03   -
+02 Splash Screen 2                  0:02   -
+03 Main Menu                        1:01   1:01
+04 Test Drives                      0:48   0:48
+05 Unknown Jingle 1                 0:02   -
+06 The Arcade                       0:44   0:44
+07 Unknown Jingle 2                 0:01   -
+08 Sports Arena                     1:02   1:02
+09 Unknown Jingle 3                 0:01   -
+10 Swords N Spells                  0:37   0:37
+11 Unknown Jingle 4                 0:02   -
+12 Wings N Wheels                   0:48   0:47
+13 Unknown Jingle 5                 0:02   -
+14 The Think Tank                   0:57   0:57
+15 Unknown Jingle 6                 0:03   -
+16 Family Room                      1:04   1:04
+17 Unknown Jingle 7                 0:03   -
+18 Classics                         0:46   0:46
+19 Newslink / Loading Screen        1:01   1:00
+20 Game Guide                       0:31   0:31
+21 Unknown Jingle 8                 0:03   -
+22 The Think Tank (long loop)       2:52   2:52
+
+Total Length                       12:34  24:44
+
+Notes:
+It's the fist MegaDrive pack ripped with
+MESS 0.140. (I needed something to test it. :)
+
+Size reduction (vgm_cmp):
+  1.59 MB -> 416 KB (25.67 %)
+
+By the way: I used the vgm2mid trimming method,
+because the GEMS sound driver makes the VGM
+Loop Finder useless.
+
+The two jingles that use the DAC are not
+optimized with optvgm, because it slightly
+increased the size of the vgm.
+
+
+I included two versions of "Think Tank",
+because of a looping bug. After the first loop
+the melody and the second bass instrument go
+out of sync (9 measures every loop).
+The normal version is looped as it's supposed
+to be. This version was hex-edited to remove
+some melody notes that were playing where the
+loop occours.
+The long version loops back after the third
+actual loop (based on the bass line). After
+some loops it's easy to hear how the music
+screws up.
+
+Funny fact: The sound test removes all trailing
+zeroes. So "Song 0" doesn't even show a number.
+
+
+Package history:
+1.00 2011/01/31 Valley Bell: Initial release.
+
+1.10 2012/3/29 dissident93: Added John Baker as composer.
