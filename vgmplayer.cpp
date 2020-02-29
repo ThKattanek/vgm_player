@@ -411,12 +411,12 @@ void VGMPlayer::ExecuteNextStreamCommand()
     // 0x52 aa dd : YM2612 port 0, write value dd to register aa
     case 0x52:
         streaming_pos += 2;
-        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
+        qDebug() << "Command 0x" << QString::number(command,16) << QString::number(streaming_data[streaming_pos-2],16) << QString::number(streaming_data[streaming_pos-1],16) << " - not supported.";
         break;
     // 0x53 aa dd : YM2612 port 1, write value dd to register aa
     case 0x53:
         streaming_pos += 2;
-        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
+        qDebug() << "Command 0x" << QString::number(command,16) << QString::number(streaming_data[streaming_pos-2],16) << QString::number(streaming_data[streaming_pos-1],16) << " - not supported.";
         break;
     // 0x54 aa dd : YM2151, write value dd to register aa
     case 0x54:

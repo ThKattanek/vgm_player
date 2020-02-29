@@ -22,13 +22,15 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     sn76489_class.cpp \
-    vgmplayer.cpp
+    vgmplayer.cpp \
+    ym2612_class.cpp
 
 HEADERS += \
     gunzip.h \
     mainwindow.h \
     sn76489_class.h \
-    vgmplayer.h
+    vgmplayer.h \
+    ym2612_class.h
 
 FORMS += \
     mainwindow.ui

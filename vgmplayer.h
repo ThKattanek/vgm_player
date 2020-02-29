@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.h                           //
 //                                              //
-// last changes at 02-23-2020                   //
+// last changes at 02-29-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -15,6 +15,7 @@
 
 #include <QtCore>
 #include "./sn76489_class.h"
+#include "./ym2612_class.h"
 
 class VGMPlayer
 {
