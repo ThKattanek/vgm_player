@@ -23,8 +23,8 @@ public:
 
     void SetClockSpeed(uint32_t clockspeed);
     void SetSampleRate(uint32_t samplerate);
-    void WriteRegPort0(uint8_t reg, uint8_t value);
-    void WriteRegPort1(uint8_t reg, uint8_t value);
+    void WriteRegPort0(uint8_t reg_nr, uint8_t value);
+    void WriteRegPort1(uint8_t reg_nr, uint8_t value);
     float GetNextSample();
 };
 
