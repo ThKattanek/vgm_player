@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja"><head>
+
+<!-- base href="http://www.memb.jp/~dearna/ma/ym2608/adpcm.html" --><title>YM2608 ADPCM</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="adpcm_files/style.css" type="text/css"></head><body>
+
+<table border="0" cellpadding="0" cellspacing="0" height="31" width="100%"><tbody><tr>
+<td><img src="adpcm_files/tma.png" alt="MobileAudio" height="31" width="138"></td>
+<td background="adpcm_files/tbar.htm" width="100%">&nbsp;</td>
+<td><img src="adpcm_files/tbw.png" alt="BlendWorks" height="31" width="144"></td>
+</tr></tbody></table><br>
+
+<blockquote class="Normal">
+以下にADPCMの基礎知識、およびYM2608のADPCM仕様を記載する。<br><br>
+
+<span class="DT">◆ADPCM</span><br>
+<blockquote>
+ADPCMはMPEGと違い、リニアPCMデータに対して1サンプルの振幅情報を圧縮する方式である。
+ADPCMはサンプル間の差分を用いてデータ圧縮を行うという基本は変わらないが、コーデックの種類は多数存在し、YM2608のADPCM仕様もそのコーデックの1つである。
+多くのコーデックは1サンプルのデータを2～4ビットに変換し、このADPCM化されたデータは完全に元の波形に戻る事は無く、コーデックの性能は「元波形の再現性」に現れる。<br><br>
+
+16ビットのリニアPCMの場合、前サンプルとの差分を表現するには最大16ビット分の情報が必要となるが、これをそのまま記録(DPCM形式)したのではデータを小さくする事ができない。
+そこでADPCMは「差分の精度を犠牲」にする事でデータを圧縮する。
+具体的にはステップサイズをコーデックのエンコード演算ルールに従い動的変化させ、各差分値を2～4ビットの精度へ変換する処理である。<br><br>
+
+たとえばYM2608のADPCMでは4ビットの情報を持つので、ステップサイズにて分割された予測される振幅値は16種類存在する。
+差分の正負で半分に分かれる為、実際に適用する予測値は8種類になり、エンコーダはこの8種類の予測値にもっとも近い場所を選びだす。
+さらにこのうち2点の予測値は、よりLowerかよりHigherな予測値範囲外の意味として扱われるため、もっとも誤差の小さい予測値は6種類になる。
+このように実際の差分値と予測値を比較しながら4ビットの値に変換処理を行うのがADPCMエンコードである。<br><br>
+
+ステップサイズとは1サンプルの分解能幅の事であり、ステップサイズが1の16ビットPCMは0～65535の65536段階で表現する。
+ステップサイズが4の16ビットPCMは下位2ビットが0である0x0000～0xFFFCの16384段階で表現する。
+ステップサイズが8192の場合、下位12ビットを0にした0x0000～0xF000の16段階で表現する。
+強引な表現では、8ビットPCMはステップサイズが256の16ビットPCMという表現も可能である(ただし記録する範囲は上位8ビットだが)。
+ステップサイズは量子化幅とも呼ばれる。<br><br>
+
+この為、ステップサイズを小さい値から大きい値に変換(ADPCMエンコード)した場合、差分値とステップサイズの境界値との誤差が大きいほど波形精度が悪くなる。
+またステップサイズを元に戻す変換(ADPCMデコード)をした場合も、落とされた精度分の情報を再現する事ができない。
+これが「元波形の再現性」と「差分の精度を犠牲」にするという意味である。<br><br>
+
+ステップサイズの動的変更は、各サンプル毎のコーデックエンコード演算によって更新される。
+これはステップサイズまでデータとして記録すると、データ圧縮として効率的で無くなる為である。
+エンコードの際に、元波形に対する適切なステップサイズが適宜使用されれば、その変換精度をなるべく高く保つ事が可能である。
+これはそのエンコーダと、その波形予測ルールが優秀であるほど、ADPCM化されたデータの復元率が高くなる事を表す。<br><br>
+<!--
+ADPCMはMPEGと違いリアルタイムエンコード時のレイテンシーの低さが特徴である。
+MPEG形式の周波数帯域圧縮はある一定時間(512サンプル)のサンプリングデータに対して圧縮しなければならない。
+これに対してADPCMは、1～3サンプル程度のデータから圧縮が可能であり、音声通信によるレイテンシを大きく下げる事が可能である。
+-->
+</blockquote>
+
+<span class="DT">◆エンコード</span><br>
+<blockquote>
+YM2608のADPCMアルゴリズムは比較的単純である。
+YM2608のADPCMは16ビットのPCMを4ビットのADPCMデータに変換する。
+またステップサイズは1/4単位の線形範囲による境界となる。
+以下にこのエンコード手順を記載する。<br><br>
+
+1.最初のサンプル X1 の取得と共に、予測値とステップサイズを初期化する。
+予測値の初期値 x0=0、ステップサイズの初期値 S0=127である。<br><br>
+
+2.ADPCMデータ An を求めるには Xn と予測値 xn の差を演算し、差分 ⊿n を求める。<br><br>
+
+3.⊿n の絶対値を Sn で分割し( I=|⊿n|/Sn )、以下の表のようにIの演算結果から下位3ビットを決定する。<br><br>
+<div align="center">
+<table class="ltb" border="1" cellpadding="2" cellspacing="0">
+<tbody><tr><td>An</td><td>L3</td><td>L2</td><td>L1</td><td>I=|⊿n|/Sn</td><td>f</td></tr>
+<tr><td>0</td><td>0</td><td>0</td><td>0</td><td>I &lt; 1/4</td><td>57/64</td></tr>
+<tr><td>1</td><td>0</td><td>0</td><td>1</td><td>1/4 &lt;= I &lt; 2/4</td><td>57/64</td></tr>
+<tr><td>2</td><td>0</td><td>1</td><td>0</td><td>2/4 &lt;= I &lt; 1/4</td><td>57/64</td></tr>
+<tr><td>3</td><td>0</td><td>1</td><td>1</td><td>3/4 &lt;= I &lt; 4/4</td><td>57/64</td></tr>
+<tr><td>4</td><td>1</td><td>0</td><td>0</td><td>4/4 &lt;= I &lt; 5/4</td><td>77/64</td></tr>
+<tr><td>5</td><td>1</td><td>0</td><td>1</td><td>5/4 &lt;= I &lt; 6/4</td><td>102/64</td></tr>
+<tr><td>6</td><td>1</td><td>1</td><td>0</td><td>6/4 &lt;= I &lt; 7/4</td><td>128/64</td></tr>
+<tr><td>7</td><td>1</td><td>1</td><td>1</td><td>7/4 &lt;= I</td><td>153/64</td></tr>
+</tbody></table>
+</div><br>
+
+⊿n と Sn の分割値 I が1/4以上かつ2/4未満であれば An は1というように求める。
+つまり実際の差分が予測ステップサイズを超える精度になった場合(1/4未満や7/4以上)、予測値を大きく外れている可能性があり、これはデータ再現性に影響が出始める事を表す。<br><br>
+
+4.⊿n が正の場合は An の最上位ビット(ビット4)を0、負の場合は1にする。<br><br>
+
+5.予測値 x(n+1) を求める。予測値の更新には An の各ビット値と以下の式を用いて求める。<br><br>
+<div align="center">
+x(n+1) = ( 1-2xL4 ) x ( L3 + L2/2 + L1/4 + 1/8 ) x ⊿n + xn
+</div><br>
+
+6.ステップサイズ S(n+1) を求める。ステップサイズの更新には、An の下位3ビットと上記表の f との関係を用いて求める。<br><br>
+<div align="center">
+S(n+1) = f( An ) x Sn
+</div><br>
+
+7.ステップサイズ Sn を飽和する。YM2608のADPCMステップサイズは最小127、最大24576と決められている。<br><br>
+
+8.データの終端まで2～7を繰り返す。
+</blockquote>
+
+<span class="DT">◆デコード</span><br>
+<blockquote>
+エンコードの5と6が予測値とステップサイズを求める式となり、予測値 xn が復元値 Xn になる。<br><br>
+
+1.最初のADPCMサンプル A1 の取得と共に、予測値とステップサイズを初期化する。
+予測値の初期値 x0=0、ステップサイズの初期値 S0=127である。<br><br>
+
+2.予測値 x(n+1) を求める。予測値の更新にはエンコード同様 An の各ビット値と表を用いて求める。<br><br>
+
+3.予測値 x(n+1) を復元値 X(n) とする。<br><br>
+
+4.復元値 X(n) を-32768～32767の範囲に適宜クリッピングする。<br><br>
+
+5.ステップサイズ S(n+1) を求める。ステップサイズの更新には、An の下位3ビットと上記表の f との関係を用いて求める。<br><br>
+
+6.ステップサイズ S(n+1) を飽和する。YM2608のADPCMステップサイズは最小127、最大24576と決められている。<br><br>
+
+7.ADPCMデータの終端まで2～6を繰り返す。
+</blockquote>
+
+
+<span class="DT">◆サンプルコード</span><br>
+<blockquote>
+<a href="http://web.archive.org/web/20050208190547/http://www.memb.jp/%7Edearna/ma/ym2608/ym2608adpcm.c">ym2608adpcm.c</a>
+</blockquote>
+
+<a class="Title" href="http://web.archive.org/web/20050208190547/http://www.memb.jp/%7Edearna/ma/index.html">戻る</a>
+</blockquote>
+<hr>
+
+<span class="Footer">Copyright(C) 2003 <a href="mailto:dearna@memb.jp">Masashi Wada ( DEARNA )</a>&nbsp;/&nbsp;<a href="http://web.archive.org/web/20050208190547/http://www.memb.jp/%7Edearna/">BlendWorks</a></span>
+<!-- SOME LINK HREF'S ON THIS PAGE HAVE BEEN REWRITTEN BY THE WAYBACK MACHINE
+OF THE INTERNET ARCHIVE IN ORDER TO PRESERVE THE TEMPORAL INTEGRITY OF THE SESSION. -->
+
+
+<script language="Javascript">
+<!--
+
+// FILE ARCHIVED ON 20050208190547 AND RETRIEVED FROM THE
+// INTERNET ARCHIVE ON 20060425200215.
+// JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+// ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+// SECTION 108(a)(3)).
+
+   var sWayBackCGI = "http://web.archive.org/web/20050208190547/";
+
+   function xLateUrl(aCollection, sProp) {
+      var i = 0;
+      for(i = 0; i < aCollection.length; i++)
+         if (aCollection[i][sProp].indexOf("mailto:") == -1 &&
+             aCollection[i][sProp].indexOf("javascript:") == -1)
+            aCollection[i][sProp] = sWayBackCGI + aCollection[i][sProp];
+   }
+
+   if (document.links)  xLateUrl(document.links, "href");
+   if (document.images) xLateUrl(document.images, "src");
+   if (document.embeds) xLateUrl(document.embeds, "src");
+
+   if (document.body && document.body.background)
+      document.body.background = sWayBackCGI + document.body.background;
+
+//-->
+
+</script>
+</body></html>
