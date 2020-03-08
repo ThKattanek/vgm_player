@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.cpp                         //
 //                                              //
-// last changes at 02-23-2020                   //
+// last changes at 03-08-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -47,8 +47,6 @@ bool VGMPlayer::Open(QString filename)
     is_playing = false;
     samples_waiting = false;
 
-    streaming_pos = 0;
-
     file.setFileName(filename);
 
     if(!file.open(QIODevice::ReadOnly))
@@ -56,7 +54,6 @@ bool VGMPlayer::Open(QString filename)
         is_file_open = false;
         return false;
     }
-
 
     // File check for gzip compression
     uint16_t gzip_id;
@@ -207,7 +204,14 @@ bool VGMPlayer::Open(QString filename)
         file.remove();
     }
 
-    InitSN76489();
+    AnalyzingStreamForSoundchips();
+
+    streaming_pos = 0;
+
+    if(is_SN76489_enabled)
+        InitSN76489();
+    if(is_YM2612_enable)
+        InitYM2612();
 
     is_file_open = true;
     return true;
@@ -225,7 +229,7 @@ void VGMPlayer::SetSampleRate(uint32_t samplerate)
     sn76489.SetSampleRate(samplerate);
 }
 
-float VGMPlayer::GetNextSample()
+void VGMPlayer::GetNextSample(float *sample_left, float *sample_right)
 {
     if(is_playing)
     {
@@ -245,13 +249,21 @@ float VGMPlayer::GetNextSample()
 
         sample_counter++;
 
-        current_output_sample = sn76489.GetNextSample();
+        current_left_output_sample = current_right_output_sample = 0.0f;
 
-        return current_output_sample;
+        if(is_SN76489_enabled)
+        {
+            float sample = sn76489.GetNextSample();
+            current_left_output_sample += sample;
+            current_right_output_sample += sample;
+        }
+
+        *sample_left = current_left_output_sample;
+        *sample_right = current_right_output_sample;
     }
     else
     {
-        return 0.0f;
+        *sample_left = *sample_right = 0.0f;
     }
 }
 
@@ -402,6 +414,7 @@ void VGMPlayer::ExecuteNextStreamCommand()
     case 0x50:
         sn76489.WriteReg(streaming_data[streaming_pos]);
         streaming_pos += 1;
+        is_SN76489_written = true;
         break;
     // 0x51 aa dd : YM2413, write value dd to register aa
     case 0x51:
@@ -410,12 +423,16 @@ void VGMPlayer::ExecuteNextStreamCommand()
         break;
     // 0x52 aa dd : YM2612 port 0, write value dd to register aa
     case 0x52:
+        ym2612.WriteRegPort0(streaming_data[streaming_pos], streaming_data[streaming_pos+1]);
         streaming_pos += 2;
+        is_YM2612_written = true;
         qDebug() << "Command 0x" << QString::number(command,16) << QString::number(streaming_data[streaming_pos-2],16) << QString::number(streaming_data[streaming_pos-1],16) << " - not supported.";
         break;
     // 0x53 aa dd : YM2612 port 1, write value dd to register aa
     case 0x53:
+        ym2612.WriteRegPort1(streaming_data[streaming_pos], streaming_data[streaming_pos+1]);
         streaming_pos += 2;
+        is_YM2612_written = true;
         qDebug() << "Command 0x" << QString::number(command,16) << QString::number(streaming_data[streaming_pos-2],16) << QString::number(streaming_data[streaming_pos-1],16) << " - not supported.";
         break;
     // 0x54 aa dd : YM2151, write value dd to register aa
@@ -508,7 +525,7 @@ void VGMPlayer::ExecuteNextStreamCommand()
         break;
     // 0x66       : end of sound data
     case 0x66:
-        is_playing = false;
+        is_analyze = is_playing = false;
         break;
     // 0x67 ...   : data block: see below
     case 0x67:
@@ -671,7 +688,29 @@ void VGMPlayer::ExecuteNextStreamCommand()
     }
 }
 
+void VGMPlayer::AnalyzingStreamForSoundchips()
+{
+    is_SN76489_enabled = is_SN76489_written = false;
+    is_YM2612_enable = is_YM2612_written = false;
+
+    is_analyze = true;
+    streaming_pos = 0;
+
+    while(is_analyze || streaming_pos < streaming_data_length)
+    {
+        ExecuteNextStreamCommand();
+    }
+
+    if(is_SN76489_written) is_SN76489_enabled = true;
+    if(is_YM2612_written) is_YM2612_enable = true;
+}
+
 void VGMPlayer::InitSN76489()
 {
     sn76489.SetClockSpeed(sn76489_clock);
+}
+
+void VGMPlayer::InitYM2612()
+{
+    ym2612.SetClockSpeed(ym2612_clock);
 }

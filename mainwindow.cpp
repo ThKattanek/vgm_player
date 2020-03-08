@@ -5,7 +5,7 @@
 //                                              //
 // #file: mainwindow.cpp                        //
 //                                              //
-// last changes at 02-15-2020                   //
+// last changes at 03-08-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -156,13 +156,15 @@ void MainWindow::FillAudioBuffer(uint8_t *stream, int size)
 {
     float *buffer = reinterpret_cast<float*>(stream);
 
+    float sample_left, sample_right;
+
     if((audio_sample_bit_size == 32) && is_audio_sample_float)
     {
         for(int i=0; i<(size / 4); i+=2)
         {
-            float sample = vgm_player.GetNextSample();
-            buffer[i] = sample;
-            buffer[i+1] = sample;
+            vgm_player.GetNextSample(&sample_left, &sample_right);
+            buffer[i] = sample_left;
+            buffer[i+1] = sample_right;
         }
     }
 }

@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.h                           //
 //                                              //
-// last changes at 02-29-2020                   //
+// last changes at 03-08-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -25,7 +25,7 @@ public:
     bool Open(QString filename);
     bool isOpen();
     void SetSampleRate(uint32_t samplerate);
-    float GetNextSample();
+    void GetNextSample(float *sample_left, float *sample_right);
     void SetPlay(bool playing);
 
     bool ExportStreamingData(QString filename);
@@ -51,20 +51,24 @@ public:
 
 private:
     void ExecuteNextStreamCommand();
+    void AnalyzingStreamForSoundchips();
     void InitSN76489();
+    void InitYM2612();
 
     QFile   file;
     bool    is_file_open;
 
     uint32_t samplerate;
 
-    bool        is_playing;
-    bool        samples_waiting;
-    uint32_t    samples_wait_counter;
+    bool     is_playing;
+    bool     is_analyze;
+    bool     samples_waiting;
+    uint32_t samples_wait_counter;
 
-    float       current_output_sample;
+    float    current_left_output_sample;
+    float    current_right_output_sample;
 
-    uint32_t    sample_counter;
+    uint32_t sample_counter;
 
     uint32_t file_ident;
     uint32_t eof_offset;
@@ -87,7 +91,14 @@ private:
     uint32_t streaming_data_length;
     uint32_t streaming_pos;
 
+    bool    is_SN76489_written;
+    bool    is_YM2612_written;
+
+    bool    is_SN76489_enabled;
+    bool    is_YM2612_enable;
+
     SN76489Class sn76489;
+    YM2612Class ym2612;
 };
 
 #endif // VGMPLAYER_H
