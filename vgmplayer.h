@@ -97,6 +97,8 @@ private:
     bool    is_SN76489_enabled;
     bool    is_YM2612_enable;
 
+    int     current_soundchip_count;
+
     SN76489Class sn76489;
     YM2612Class ym2612;
 };

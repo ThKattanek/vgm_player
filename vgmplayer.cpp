@@ -258,8 +258,8 @@ void VGMPlayer::GetNextSample(float *sample_left, float *sample_right)
             current_right_output_sample += sample;
         }
 
-        *sample_left = current_left_output_sample;
-        *sample_right = current_right_output_sample;
+        *sample_left = current_left_output_sample / static_cast<float>(current_soundchip_count);
+        *sample_right = current_right_output_sample / static_cast<float>(current_soundchip_count);
     }
     else
     {
@@ -693,6 +693,8 @@ void VGMPlayer::AnalyzingStreamForSoundchips()
     is_SN76489_enabled = is_SN76489_written = false;
     is_YM2612_enable = is_YM2612_written = false;
 
+    current_soundchip_count = 0;
+
     is_analyze = true;
     streaming_pos = 0;
 
@@ -701,8 +703,16 @@ void VGMPlayer::AnalyzingStreamForSoundchips()
         ExecuteNextStreamCommand();
     }
 
-    if(is_SN76489_written) is_SN76489_enabled = true;
-    if(is_YM2612_written) is_YM2612_enable = true;
+    if(is_SN76489_written)
+    {
+        is_SN76489_enabled = true;
+        current_soundchip_count++;
+    }
+    if(is_YM2612_written)
+    {
+        is_YM2612_enable = true;
+        current_soundchip_count++;
+    }
 }
 
 void VGMPlayer::InitSN76489()
