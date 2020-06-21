@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.h                           //
 //                                              //
-// last changes at 03-08-2020                   //
+// last changes at 06-20-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////

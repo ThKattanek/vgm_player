@@ -1,11 +1,11 @@
-QT       += core gui
+QT       += core gui multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
 
 CONFIG += link_pkgconfig
-PKGCONFIG += sdl2 zlib
+PKGCONFIG += zlib
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -23,14 +23,16 @@ SOURCES += \
     mainwindow.cpp \
     sn76489_class.cpp \
     vgmplayer.cpp \
-    ym2612_class.cpp
+    ym2612_class.cpp \
+    audiogenerator.cpp
 
 HEADERS += \
     gunzip.h \
     mainwindow.h \
     sn76489_class.h \
     vgmplayer.h \
-    ym2612_class.h
+    ym2612_class.h \
+    audiogenerator.h
 
 FORMS += \
     mainwindow.ui

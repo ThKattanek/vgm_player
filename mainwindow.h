@@ -5,7 +5,7 @@
 //                                              //
 // #file: mainwindow.h                          //
 //                                              //
-// last changes at 02-15-2020                   //
+// last changes at 06-21-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,8 +16,15 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <SDL2/SDL.h>
+
+#include "./audiogenerator.h"
 #include "./vgmplayer.h"
+
+#include <QAudioFormat>
+#include <QAudioDeviceInfo>
+#include <QAudioOutput>
+
+#define SOUND_BUFFER_SIZE 8192
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -30,31 +37,28 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void FillAudioBuffer(uint8_t *stream, int size);
 
 private slots:
     void on_actionOpen_triggered();
-
     void on_actionE_xit_triggered();
-
     void on_action_Export_Streaming_Data_triggered();
+
+    void OnFillAudioData(char *data, qint64 len);
 
 private:
     Ui::MainWindow *ui;
 
     VGMPlayer vgm_player;
     void LogText(const QString text);
-    void InitSDLAudio();
+    void InitAudio();
+    void ReleaseAudio();
 
+    unsigned int bufferSize;
+    QAudioDeviceInfo m_device;
+    QAudioFormat     m_format;
+    QByteArray       m_buffer;
+    QAudioOutput    *m_audioOutput;
 
-    SDL_AudioSpec   audio_spec_want;
-    SDL_AudioSpec   audio_spec_have;
-
-    uint16_t        audio_sample_bit_size;
-    uint16_t        audio_channels;
-    bool            is_audio_sample_little_endian;
-    bool            is_audio_sample_float;
-    bool            is_audio_sample_signed;
-
+    AudioGenerator *m_audiogen;
 };
 #endif // MAINWINDOW_H
