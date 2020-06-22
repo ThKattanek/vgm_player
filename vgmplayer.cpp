@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.cpp                         //
 //                                              //
-// last changes at 03-08-2020                   //
+// last changes at 06-22-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -171,6 +171,13 @@ bool VGMPlayer::Open(QString filename)
     else
         vgm_data_offset += 0x34;    // offset from file begin
 
+    if(version_number == 0x00000161 || version_number == 0x00000170)
+    {
+        // GameBoy DMG Clock
+        file.seek(0x80);
+        nbytes = file.read(reinterpret_cast<char*>(&gb_dmg_clock), 4);
+    }
+
     file.seek(vgm_data_offset);
 
     if(streaming_data == nullptr)
@@ -212,6 +219,8 @@ bool VGMPlayer::Open(QString filename)
         InitSN76489();
     if(is_YM2612_enable)
         InitYM2612();
+    if(is_GB_DMG_enable)
+        InitGBDMG();
 
     is_file_open = true;
     return true;
@@ -227,6 +236,8 @@ void VGMPlayer::SetSampleRate(uint32_t samplerate)
     this->samplerate = samplerate;
 
     sn76489.SetSampleRate(samplerate);
+    ym2612.SetSampleRate(samplerate);
+    gbdmg.SetSampleRate(samplerate);
 }
 
 void VGMPlayer::GetNextSample(float *sample_left, float *sample_right)
@@ -258,8 +269,30 @@ void VGMPlayer::GetNextSample(float *sample_left, float *sample_right)
             current_right_output_sample += sample;
         }
 
-        *sample_left = current_left_output_sample / static_cast<float>(current_soundchip_count);
-        *sample_right = current_right_output_sample / static_cast<float>(current_soundchip_count);
+        if(is_YM2612_enable)
+        {
+            float sample = 0.0f;
+            current_left_output_sample += sample;
+            current_right_output_sample += sample;
+        }
+
+        if(is_GB_DMG_enable)
+        {
+            float sample = gbdmg.GetNextSample();
+            current_left_output_sample += sample;
+            current_right_output_sample += sample;
+        }
+
+        if(current_soundchip_count > 0)
+        {
+            *sample_left = current_left_output_sample / static_cast<float>(current_soundchip_count);
+            *sample_right = current_right_output_sample / static_cast<float>(current_soundchip_count);
+        }
+        else
+        {
+            *sample_left = 0.0f;
+            *sample_right = 0.0f;
+        }
     }
     else
     {
@@ -385,6 +418,11 @@ uint32_t VGMPlayer::GetYM2151Clock()
 uint32_t VGMPlayer::GetVGMDataOffset()
 {
     return vgm_data_offset;
+}
+
+uint32_t VGMPlayer::GetGB_DMGClock()
+{
+    return gb_dmg_clock;
 }
 
 uint32_t VGMPlayer::GetCurrentSamplesCount()
@@ -584,8 +622,9 @@ void VGMPlayer::ExecuteNextStreamCommand()
         break;
     // 0xB3 aa dd : GameBoy DMG, write value dd to register aa
     case 0xb3:
+        gbdmg.WriteReg(streaming_data[streaming_pos], streaming_data[streaming_pos+1]);
         streaming_pos += 2;
-        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
+        is_GB_DMG_written = true;
         break;
     // 0xB4 aa dd : NES APU, write value dd to register aa
     case 0xb4:
@@ -692,6 +731,7 @@ void VGMPlayer::AnalyzingStreamForSoundchips()
 {
     is_SN76489_enabled = is_SN76489_written = false;
     is_YM2612_enable = is_YM2612_written = false;
+    is_GB_DMG_enable = is_GB_DMG_written = false;
 
     current_soundchip_count = 0;
 
@@ -708,9 +748,16 @@ void VGMPlayer::AnalyzingStreamForSoundchips()
         is_SN76489_enabled = true;
         current_soundchip_count++;
     }
+
     if(is_YM2612_written)
     {
         is_YM2612_enable = true;
+        current_soundchip_count++;
+    }
+
+    if(is_GB_DMG_written)
+    {
+        is_GB_DMG_enable = true;
         current_soundchip_count++;
     }
 }
@@ -723,4 +770,9 @@ void VGMPlayer::InitSN76489()
 void VGMPlayer::InitYM2612()
 {
     ym2612.SetClockSpeed(ym2612_clock);
+}
+
+void VGMPlayer::InitGBDMG()
+{
+    gbdmg.SetClockSpeed(gb_dmg_clock);
 }

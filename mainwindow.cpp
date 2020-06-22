@@ -5,7 +5,7 @@
 //                                              //
 // #file: mainwindow.cpp                        //
 //                                              //
-// last changes at 06-21-2020                   //
+// last changes at 06-22-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -89,10 +89,6 @@ void MainWindow::OnFillAudioData(char *data, qint64 len)
             buffer[i] = sample_left;
             buffer[i+1] = sample_right;
         }
-
-
-
-    qDebug() << "Audio Call:";
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -103,7 +99,7 @@ void MainWindow::on_actionOpen_triggered()
     vgm_player.Open(fileName);
     vgm_player.SetPlay(true);
 
-    /*
+
     LogText("- VGM Demo Datei wurde geöffnet. [" + QString::number(vgm_player.GetFileSize()) + " Bytes]");
     LogText("- EOF Offset: 0x" + QString::number(vgm_player.GetEOFOffset(),16).toUpper() + " | " + (QString::number(vgm_player.GetEOFOffset())));
     LogText("- VGM Version Nummer: " + vgm_player.GetVersion());
@@ -119,8 +115,8 @@ void MainWindow::on_actionOpen_triggered()
     LogText("- SN76489 Flags: 0x" + QString::number(vgm_player.GetSN76489Flags(),16));
     LogText("- YM2612 Clock: " + QString::number(vgm_player.GetYM2612Clock()) + " Hz");
     LogText("- YM2151 Clock: " + QString::number(vgm_player.GetYM2151Clock()) + " Hz");
+    LogText("- GameBoy DMG Clock: " + QString::number(vgm_player.GetGB_DMGClock()) + " Hz");
     LogText("- VGM Data Offset: 0x" + QString::number(vgm_player.GetVGMDataOffset(),16));
-    */
 }
 
 void MainWindow::on_actionE_xit_triggered()

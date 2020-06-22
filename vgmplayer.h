@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.h                           //
 //                                              //
-// last changes at 06-20-2020                   //
+// last changes at 06-22-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,6 +16,7 @@
 #include <QtCore>
 #include "./sn76489_class.h"
 #include "./ym2612_class.h"
+#include "./gb_dmg_class.h"
 
 class VGMPlayer
 {
@@ -46,6 +47,7 @@ public:
     uint32_t GetYM2612Clock();
     uint32_t GetYM2151Clock();
     uint32_t GetVGMDataOffset();
+    uint32_t GetGB_DMGClock();
     uint32_t GetCurrentSamplesCount();
     uint32_t GetStreamingPos();
 
@@ -54,6 +56,7 @@ private:
     void AnalyzingStreamForSoundchips();
     void InitSN76489();
     void InitYM2612();
+    void InitGBDMG();
 
     QFile   file;
     bool    is_file_open;
@@ -85,6 +88,7 @@ private:
     uint8_t sn76489_flags;
     uint32_t ym2612_clock;
     uint32_t ym2151_clock;
+    uint32_t gb_dmg_clock;
     uint32_t vgm_data_offset;
 
     uint8_t *streaming_data;
@@ -93,14 +97,17 @@ private:
 
     bool    is_SN76489_written;
     bool    is_YM2612_written;
+    bool    is_GB_DMG_written;
 
     bool    is_SN76489_enabled;
     bool    is_YM2612_enable;
+    bool    is_GB_DMG_enable;
 
     int     current_soundchip_count;
 
     SN76489Class sn76489;
     YM2612Class ym2612;
+    GB_DMGClass gbdmg;
 };
 
 #endif // VGMPLAYER_H
