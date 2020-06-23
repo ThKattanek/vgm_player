@@ -15,6 +15,13 @@
 
 GB_DMGClass::GB_DMGClass()
 {
+    clockspeed = 4194304;
+    samplerate = 44100;
+    CalcSubCounter();
+
+    square1_out = 0.3f;
+    square_table = 0x07;
+
     Reset();
 }
 
@@ -25,12 +32,14 @@ GB_DMGClass::~GB_DMGClass()
 
 void GB_DMGClass::SetClockSpeed(uint32_t clockspeed)
 {
-
+    this->clockspeed = clockspeed;
+    CalcSubCounter();
 }
 
 void GB_DMGClass::SetSampleRate(uint32_t samplerate)
 {
-
+    this->samplerate = samplerate;
+    CalcSubCounter();
 }
 
 void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
@@ -112,7 +121,25 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
 
 float GB_DMGClass::GetNextSample()
 {
-    return 0.0f;
+    square1_counter -= sub_counter;
+    if(square1_counter <= 0)
+    {
+        square1_counter += (uint16_t)( NR13 | ((NR14 & 0x07) << 8));
+
+        if(square_table & (1 << (7 - square1_counter)))
+        {
+            square1_out = 0.3f;
+        }
+        else
+        {
+            square1_out = -0.3f;
+        }
+
+        square1_wave_counter++;
+        square1_wave_counter &= 0x07;
+    }
+
+    return square1_out;
 }
 
 void GB_DMGClass::Reset()
@@ -122,4 +149,11 @@ void GB_DMGClass::Reset()
     NR30=NR31=NR32=NR33=NR34=0;
     NR41=NR42=NR43=NR44=0;
     NR50=NR51=NR52=0;
+
+    square1_wave_counter = 0;
+}
+
+void GB_DMGClass::CalcSubCounter()
+{
+    sub_counter = clockspeed / samplerate;
 }

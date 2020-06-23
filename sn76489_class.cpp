@@ -19,6 +19,8 @@ SN76489Class::SN76489Class()
     clockspeed = 4000000;
     samplerate = 44100;
 
+    CalcSubCounter();
+
     tone1_output = 0.25f;
     tone2_output = 0.25f;
     tone3_output = 0.25f;

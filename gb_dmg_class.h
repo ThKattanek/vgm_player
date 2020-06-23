@@ -28,6 +28,19 @@ public:
 
 private:
     void Reset();
+    void CalcSubCounter();
+
+    uint32_t clockspeed;        // as Hz
+    uint32_t samplerate;        // as Hz
+    uint16_t sub_counter;
+
+    int16_t square1_counter;
+
+    uint8_t square1_wave_counter;
+
+    uint8_t square_table;
+
+    float square1_out;
 
     // Registers for Square 1
     uint8_t NR10,NR11,NR12,NR13,NR14;
@@ -46,6 +59,8 @@ private:
 
     // Wavetable 16 Byte for 32 4-Bit Samples
     uint8_t WAVE_TABLE[32];
+
+    // Squre1
 };
 
 #endif // GB_DMGCLASS_H
