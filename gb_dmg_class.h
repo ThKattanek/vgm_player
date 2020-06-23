@@ -5,7 +5,7 @@
 //                                              //
 // #file: gb_dmg_class.h                        //
 //                                              //
-// last changes at 06-22-2020                   //
+// last changes at 06-23-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////

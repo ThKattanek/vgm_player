@@ -5,7 +5,7 @@
 //                                              //
 // #file: gb_dmg_class.cpp                      //
 //                                              //
-// last changes at 06-22-2020                   //
+// last changes at 06-23-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,8 +18,6 @@ GB_DMGClass::GB_DMGClass()
     clockspeed = 4194304;
     samplerate = 44100;
     CalcSubCounter();
-
-    square1_out = 0.3f;
 
     square_duty_table[0] = 0x08;    // 12,5%
     square_duty_table[1] = 0x0C;    // 25%

@@ -5,13 +5,15 @@
 //                                              //
 // #file: vgmplayer.cpp                         //
 //                                              //
-// last changes at 06-22-2020                   //
+// last changes at 06-23-2020                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "vgmplayer.h"
 #include "./gunzip.h"
+
+//#define GB_DMG_TEST
 
 VGMPlayer::VGMPlayer()
 {
@@ -24,6 +26,13 @@ VGMPlayer::VGMPlayer()
     streaming_data = nullptr;
     streaming_data_length = 0;
     streaming_pos = 0;
+
+#ifdef GB_DMG_TEST
+    gbdmg.SetClockSpeed(4194304);
+    gbdmg.WriteReg(0x01, 2<<6);
+    gbdmg.WriteReg(0x03, 0);
+    gbdmg.WriteReg(0x04, 1);
+#endif
 }
 
 VGMPlayer::~VGMPlayer()
@@ -297,6 +306,12 @@ void VGMPlayer::GetNextSample(float *sample_left, float *sample_right)
     else
     {
         *sample_left = *sample_right = 0.0f;
+
+#ifdef GB_DMG_TEST
+        float sample = gbdmg.GetNextSample();
+        *sample_left = sample;
+        *sample_left = sample;
+#endif
     }
 }
 
