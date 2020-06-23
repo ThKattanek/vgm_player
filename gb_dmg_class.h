@@ -25,6 +25,27 @@ public:
     void SetSampleRate(uint32_t samplerate);
     void WriteReg(uint8_t reg_nr, uint8_t value);
     float GetNextSample();
+
+private:
+    void Reset();
+
+    // Registers for Square 1
+    uint8_t NR10,NR11,NR12,NR13,NR14;
+
+    // Registers for Square 2
+    uint8_t NR21,NR22,NR23,NR24;
+
+    // Registers for Wave
+    uint8_t NR30,NR31,NR32,NR33,NR34;
+
+    // Registers for Noise
+    uint8_t NR41,NR42,NR43,NR44;
+
+    // Registers for Controlls
+    uint8_t NR50,NR51,NR52;
+
+    // Wavetable 16 Byte for 32 4-Bit Samples
+    uint8_t WAVE_TABLE[32];
 };
 
 #endif // GB_DMGCLASS_H
