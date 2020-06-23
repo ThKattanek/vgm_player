@@ -105,7 +105,7 @@ void MainWindow::OnFillAudioData(char *data, qint64 len)
 
     float sample_left, sample_right;
 
-    for(int i=0; i<(len / m_format.sampleSize()); i+=2)
+    for(int i=0; i<(len / (m_format.sampleSize()/8)); i+=2)
     {
         vgm_player.GetNextSample(&sample_left, &sample_right);
         buffer[i] = sample_left;
