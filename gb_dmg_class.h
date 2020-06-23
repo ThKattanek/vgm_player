@@ -34,11 +34,15 @@ private:
     uint32_t samplerate;        // as Hz
     uint16_t sub_counter;
 
+    uint16_t square1_start_counter;
+    uint8_t square1_duty;
     int16_t square1_counter;
+
+    uint8_t square1_length_counter;
 
     uint8_t square1_wave_counter;
 
-    uint8_t square_table;
+    uint8_t square_duty_table[4];
 
     float square1_out;
 

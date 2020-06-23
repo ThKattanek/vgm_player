@@ -20,7 +20,11 @@ GB_DMGClass::GB_DMGClass()
     CalcSubCounter();
 
     square1_out = 0.3f;
-    square_table = 0x07;
+
+    square_duty_table[0] = 0x08;    // 12,5%
+    square_duty_table[1] = 0x0C;    // 25%
+    square_duty_table[2] = 0x3C;    // 50%
+    square_duty_table[3] = 0xf3;    // 75%
 
     Reset();
 }
@@ -51,15 +55,19 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
         break;
     case 0x11:
         NR11 = value;
+        square1_length_counter = value & 0x3f;
+        square1_duty = value >> 6;
         break;
     case 0x12:
         NR12 = value;
         break;
     case 0x13:
         NR13 = value;
+        square1_start_counter = 2048-( NR13 | (NR14 & 0x07) << 8);
         break;
     case 0x14:
         NR14 = value;
+        square1_start_counter = 2048-( NR13 | (NR14 & 0x07) << 8);
         break;
     case 0x16:
         NR21 = value;
@@ -124,22 +132,22 @@ float GB_DMGClass::GetNextSample()
     square1_counter -= sub_counter;
     if(square1_counter <= 0)
     {
-        square1_counter += (uint16_t)( NR13 | ((NR14 & 0x07) << 8));
+        square1_counter += square1_start_counter;
 
-        if(square_table & (1 << (7 - square1_counter)))
+        if(square_duty_table[square1_duty] & (1 << (7 - square1_wave_counter)))
         {
-            square1_out = 0.3f;
+            square1_out = 1.0f;
         }
         else
         {
-            square1_out = -0.3f;
+            square1_out = -1.0f;
         }
 
         square1_wave_counter++;
         square1_wave_counter &= 0x07;
     }
 
-    return square1_out;
+        return square1_out;
 }
 
 void GB_DMGClass::Reset()
@@ -151,6 +159,8 @@ void GB_DMGClass::Reset()
     NR50=NR51=NR52=0;
 
     square1_wave_counter = 0;
+    square1_length_counter = 0;
+    square1_duty = 0;
 }
 
 void GB_DMGClass::CalcSubCounter()

@@ -95,6 +95,7 @@ void MainWindow::InitAudio()
 
 void MainWindow::ReleaseAudio()
 {
+    disconnect(m_audiogen, SIGNAL(FillAudioData(char*, qint64)), this, SLOT(OnFillAudioData(char*, qint64)));
     m_audioOutput->stop();
     delete m_audioOutput;
 }
