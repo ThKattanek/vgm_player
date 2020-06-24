@@ -13,7 +13,7 @@
 #include "vgmplayer.h"
 #include "./gunzip.h"
 
-//#define GB_DMG_TEST
+#define GB_DMG_TEST
 
 VGMPlayer::VGMPlayer()
 {
@@ -30,8 +30,11 @@ VGMPlayer::VGMPlayer()
 #ifdef GB_DMG_TEST
     gbdmg.SetClockSpeed(4194304);
     gbdmg.WriteReg(0x01, 2<<6);
-    gbdmg.WriteReg(0x03, 0);
+    gbdmg.WriteReg(0x03, 5);
     gbdmg.WriteReg(0x04, 1);
+   // gbdmg.WriteReg(0x01, 2<<6);
+   // gbdmg.WriteReg(0x03, 0);
+   // gbdmg.WriteReg(0x04, 1);
 #endif
 }
 
@@ -448,6 +451,11 @@ uint32_t VGMPlayer::GetCurrentSamplesCount()
 uint32_t VGMPlayer::GetStreamingPos()
 {
     return streaming_pos;
+}
+
+void VGMPlayer::WriteGBDMGRegister(uint8_t reg_nr, uint8_t value)
+{
+    gbdmg.WriteReg(reg_nr, value);
 }
 
 void VGMPlayer::ExecuteNextStreamCommand()

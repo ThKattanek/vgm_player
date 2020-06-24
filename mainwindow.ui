@@ -6,15 +6,90 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>448</width>
-    <height>314</height>
+    <width>366</width>
+    <height>636</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="OscilloscopeWidget" name="oscilloscope" native="true"/>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>GameBoy GMD Controll</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>RegisterNr.:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="gb_reg_num">
+         <property name="minimum">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <number>47</number>
+         </property>
+         <property name="displayIntegerBase">
+          <number>16</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Value:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="gb_reg_value">
+         <property name="maximum">
+          <number>255</number>
+         </property>
+         <property name="displayIntegerBase">
+          <number>16</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="gb_write_reg">
+         <property name="text">
+          <string>Write Reg</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
     <item>
      <widget class="QPlainTextEdit" name="log_output">
       <property name="font">
@@ -41,8 +116,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>448</width>
-     <height>21</height>
+     <width>366</width>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -73,6 +148,14 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>OscilloscopeWidget</class>
+   <extends>QWidget</extends>
+   <header>widgets/oscilloscope_widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

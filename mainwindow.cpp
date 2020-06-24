@@ -25,6 +25,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     LogText("VGM Player - by Thorsten Kattanek\n");
 
+    ui->oscilloscope->setFixedSize(10*50, 8*50);
+    ui->oscilloscope->SetSamplerate(SAMPLERATE);
+    ui->oscilloscope->SetVerticalPosition(0.5f);
+    ui->oscilloscope->SetTriggerTyp(TRIGGER_TYP::RISING_EDGE);
+    ui->oscilloscope->SetTriggerLevel(0);
+
     InitAudio();
 }
 
@@ -112,6 +118,8 @@ void MainWindow::OnFillAudioData(char *data, qint64 len)
         buffer[i] = sample_left;
         buffer[i+1] = sample_right;
     }
+
+    ui->oscilloscope->NextAudioData(reinterpret_cast<float*>(data), len / 4);
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -160,4 +168,9 @@ void MainWindow::on_action_Export_Streaming_Data_triggered()
     }
     else
         QMessageBox::information(this,tr("VGM Player Info"),tr("VGM File is not open!"));
+}
+
+void MainWindow::on_gb_write_reg_clicked()
+{
+    vgm_player.WriteGBDMGRegister(ui->gb_reg_num->value(), ui->gb_reg_value->value());
 }

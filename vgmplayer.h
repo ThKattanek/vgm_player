@@ -51,6 +51,8 @@ public:
     uint32_t GetCurrentSamplesCount();
     uint32_t GetStreamingPos();
 
+    void WriteGBDMGRegister(uint8_t reg_nr, uint8_t value);
+
 private:
     void ExecuteNextStreamCommand();
     void AnalyzingStreamForSoundchips();

@@ -26,7 +26,8 @@ SOURCES += \
     sn76489_class.cpp \
     vgmplayer.cpp \
     ym2612_class.cpp \
-    audiogenerator.cpp
+    audiogenerator.cpp \
+    widgets/oscilloscope_widget.cpp
 
 HEADERS += \
     gb_dmg_class.h \
@@ -35,10 +36,12 @@ HEADERS += \
     sn76489_class.h \
     vgmplayer.h \
     ym2612_class.h \
-    audiogenerator.h
+    audiogenerator.h \
+    widgets/oscilloscope_widget.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    widgets/oscilloscope_widget.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -45,6 +45,8 @@ private slots:
 
     void OnFillAudioData(char *data, qint64 len);
 
+    void on_gb_write_reg_clicked();
+
 private:
     Ui::MainWindow *ui;
 
