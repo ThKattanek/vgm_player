@@ -119,7 +119,7 @@ void MainWindow::OnFillAudioData(char *data, qint64 len)
         buffer[i+1] = sample_right;
     }
 
-    ui->oscilloscope->NextAudioData(reinterpret_cast<float*>(data), len / 4);
+    ui->oscilloscope->NextAudioData(reinterpret_cast<float*>(data), len / (m_format.sampleSize()/8));
 }
 
 void MainWindow::on_actionOpen_triggered()

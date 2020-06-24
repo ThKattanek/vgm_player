@@ -37,6 +37,7 @@ OscilloscopeWidget::OscilloscopeWidget(QWidget *parent) :
     output_line_pen = new QPen(Qt::green, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
 
     trigger_sample_counter = 0;
+    sample_counter_period = 0;
 }
 
 OscilloscopeWidget::~OscilloscopeWidget()
@@ -145,6 +146,9 @@ void OscilloscopeWidget::DrawInfos(QPainter &painter, int width, int height)
 
     OutString = "Frequncy: " + QVariant(samplerate / sample_counter_period).toString() + "Hz";
     painter.drawText(15,25,OutString);
+
+    OutString = "Samples: " + QVariant(sample_counter_period).toString();
+    painter.drawText(15,35,OutString);
 }
 
 void OscilloscopeWidget::NextAudioData(float *data, int length)
@@ -166,30 +170,39 @@ void OscilloscopeWidget::NextAudioData(float *data, int length)
         case TRIGGER_OFF:
             break;
         case RISING_EDGE:
-            if((old_value < trigger_level) && (current_value >= trigger_level) && !trigger)
+            if((old_value < trigger_level) && (current_value >= trigger_level))
             {
-                trigger = true;
                 sample_counter_period = trigger_sample_counter;
                 trigger_sample_counter = 0;
-                output_plane_xpos = 0;
-                ringbuffer_pos_r = ringbuffer_pos_w - width() * horizontal_position;
-                ringbuffer_pos_r &= 0x1fff;
+
+                if(!trigger)
+                {
+                    trigger = true;
+                    output_plane_xpos = 0;
+                    ringbuffer_pos_r = ringbuffer_pos_w - width() * horizontal_position;
+                    ringbuffer_pos_r &= 0x1fff;
+                }
             }
             break;
         case FALLING_EDGE:
-            if((old_value > trigger_level) && (current_value <= trigger_level) && !trigger)
+            if((old_value > trigger_level) && (current_value <= trigger_level))
             {
-                trigger = true;
                 sample_counter_period = trigger_sample_counter;
                 trigger_sample_counter = 0;
-                output_plane_xpos = 0;
-                ringbuffer_pos_r = ringbuffer_pos_w - width() * horizontal_position;
-                ringbuffer_pos_r &= 0x1fff;
+
+                if(!trigger)
+                {
+                    trigger = true;
+                    output_plane_xpos = 0;
+                    ringbuffer_pos_r = ringbuffer_pos_w - width() * horizontal_position;
+                    ringbuffer_pos_r &= 0x1fff;
+                }
             }
             break;
         }
 
         old_value = current_value;
+         trigger_sample_counter++;
 
         ringbuffer[ringbuffer_pos_w++] = static_cast<int>(current_value * -1.0f * y_div_pix + y_add);
         ringbuffer_pos_w &= 0x1fff;
@@ -208,7 +221,7 @@ void OscilloscopeWidget::NextAudioData(float *data, int length)
             refresh = true;
         }
 
-        trigger_sample_counter++;
+
     }
 }
 
