@@ -25,12 +25,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     LogText("VGM Player - by Thorsten Kattanek\n");
 
-    ui->oscilloscope->setFixedSize(10*80, 8*80);
+    ui->oscilloscope->setFixedSize(10*40, 8*40);
     ui->oscilloscope->SetSamplerate(SAMPLERATE);
     ui->oscilloscope->SetVerticalPosition(0.5f);
     ui->oscilloscope->SetTriggerTyp(TRIGGER_TYP::RISING_EDGE);
     ui->oscilloscope->SetTriggerLevel(0);
-    ui->oscilloscope->SetVoltPerDivision(0.5f);
+    ui->oscilloscope->SetVoltPerDivision(0.25f);
 
     InitAudio();
 }

@@ -69,15 +69,19 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
         break;
     case 0x16:
         NR21 = value;
+        square2_length_counter = value & 0x3f;
+        square2_duty = value >> 6;
         break;
     case 0x17:
         NR22 = value;
         break;
     case 0x18:
         NR23 = value;
+        square2_start_counter = 2048-( NR23 | (NR24 & 0x07) << 8);
         break;
     case 0x19:
         NR24 = value;
+        square2_start_counter = 2048-( NR23 | (NR24 & 0x07) << 8);
         break;
     case 0x1A:
         NR30 = value;
@@ -127,41 +131,52 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
 
 float GB_DMGClass::GetNextSample()
 {
+    //Sqaure1
     square1_counter -= sub_counter;
     if(square1_counter <= 0)
     {
         square1_counter += square1_start_counter;
 
         if(square_duty_table[square1_duty] & (1 << (7 - square1_wave_counter)))
-        {
-            square1_out = 1.0f;
-        }
+            square1_out = 0.25f;
         else
-        {
-            square1_out = -1.0f;
-        }
+            square1_out = -0.25f;
 
         square1_wave_counter++;
         square1_wave_counter &= 0x07;
     }
 
-        return square1_out;
+    //Sqaure2
+    square2_counter -= sub_counter;
+    if(square2_counter <= 0)
+    {
+        square2_counter += square2_start_counter;
+
+        if(square_duty_table[square2_duty] & (1 << (7 - square2_wave_counter)))
+            square2_out = 0.25f;
+        else
+            square2_out = -0.25f;
+
+        square2_wave_counter++;
+        square2_wave_counter &= 0x07;
+    }
+
+    return square1_out ;
 }
 
 void GB_DMGClass::Reset()
 {
-    NR10=NR11=NR12=NR13=NR14=0;
-    NR21=NR22=NR23=NR24=0;
-    NR30=NR31=NR32=NR33=NR34=0;
-    NR41=NR42=NR43=NR44=0;
-    NR50=NR51=NR52=0;
+    for(uint8_t i=0; i<0x30; i++)
+        WriteReg(i,0);
 
+    square1_counter = 0;
     square1_wave_counter = 0;
-    square1_length_counter = 0;
-    square1_duty = 0;
+
+    square2_counter = 0;
+    square2_wave_counter = 0;
 }
 
 void GB_DMGClass::CalcSubCounter()
 {
-    sub_counter = clockspeed / samplerate;
+    sub_counter = (clockspeed / samplerate) / 4;
 }
