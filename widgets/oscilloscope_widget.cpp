@@ -16,6 +16,10 @@ OscilloscopeWidget::OscilloscopeWidget(QWidget *parent) :
     raster_color.setRgb(0,0,0);
     trigger_line_color.setRgb(150,150,150);
 
+    info_text_color.setRgb(220,220,220);
+    info_text_font = QFont();
+    info_text_font.setPixelSize(14);
+
     vertical_position = 0.5f;
     horizontal_position = 0.5f;
     amplifire = 1.0f;
@@ -139,16 +143,17 @@ void OscilloscopeWidget::DrawData(QPainter &painter, int width)
 
 void OscilloscopeWidget::DrawInfos(QPainter &painter, int width, int height)
 {
-    QString OutString = "Period: " + QVariant((1.0f/samplerate) * sample_counter_period).toString() + "sek";
+    painter.setFont(info_text_font);
+    painter.setPen(info_text_color);
 
-    painter.setPen(*output_line_pen);
-    painter.drawText(15,15,OutString);
+    QString OutString = "Periodic time: " + QString::number((1.0f/samplerate) * sample_counter_period)+ " sek";
+    painter.drawText(10,20,OutString);
 
-    OutString = "Frequncy: " + QVariant(samplerate / sample_counter_period).toString() + "Hz";
-    painter.drawText(15,25,OutString);
+    OutString = "Frequncy: " + QString::number(samplerate / sample_counter_period) + " Hz";
+    painter.drawText(10,35,OutString);
 
-    OutString = "Samples: " + QVariant(sample_counter_period).toString();
-    painter.drawText(15,35,OutString);
+    OutString = QString::number(1.0f / amplifire) + " Volt/Div";
+    painter.drawText(10,height-10,OutString);
 }
 
 void OscilloscopeWidget::NextAudioData(float *data, int length)
@@ -277,6 +282,11 @@ void OscilloscopeWidget::SetVerticalPosition(float value)
 void OscilloscopeWidget::SetAmplifire(float value)
 {
     amplifire = value;
+}
+
+void OscilloscopeWidget::SetVoltPerDivision(float value)
+{
+    amplifire = 1.0f / value;
 }
 
 void OscilloscopeWidget::SetTriggerTyp(int value)

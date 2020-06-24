@@ -30,11 +30,8 @@ VGMPlayer::VGMPlayer()
 #ifdef GB_DMG_TEST
     gbdmg.SetClockSpeed(4194304);
     gbdmg.WriteReg(0x01, 2<<6);
-    gbdmg.WriteReg(0x03, 5);
-    gbdmg.WriteReg(0x04, 1);
-   // gbdmg.WriteReg(0x01, 2<<6);
-   // gbdmg.WriteReg(0x03, 0);
-   // gbdmg.WriteReg(0x04, 1);
+    gbdmg.WriteReg(0x03, 0);
+    gbdmg.WriteReg(0x04, 0);
 #endif
 }
 

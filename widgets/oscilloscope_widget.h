@@ -29,6 +29,7 @@ public:
     void SetRasterColor(QColor color);
     void SetVerticalPosition(float value);      // 0.0f is top 1.0 is bottom
     void SetAmplifire(float value);
+    void SetVoltPerDivision(float value);
     void SetTriggerTyp(int value);
     void SetTriggerLevel(float value);
 
@@ -61,6 +62,9 @@ private:
 
     QPen *output_line_pen;
     int output_plane_xpos;
+
+    QColor info_text_color;
+    QFont info_text_font;
 
     int ringbuffer[0x10000];
     int ringbuffer_pos_w;
