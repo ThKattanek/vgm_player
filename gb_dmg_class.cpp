@@ -161,22 +161,58 @@ float GB_DMGClass::GetNextSample()
         square2_wave_counter &= 0x07;
     }
 
-    return square1_out ;
+    return square1_out + square2_out;
 }
 
 void GB_DMGClass::Reset()
 {
-    for(uint8_t i=0; i<0x30; i++)
-        WriteReg(i,0);
+    /*
+     * Initial Register Values
+        $FF10(NR10) - 0x80
+        $FF11(NR11) - 0xBF
+        $FF12(NR12) - 0xF3
+        $FF13(NR13) - No Change
+        $FF14(NR14) - 0xBF
+        $FF15(NR20) - No Change
+        $FF16(NR21) - 0x3F
+        $FF17(NR22) - 0x00
+        $FF18(NR23) - No Change
+        $FF19(NR24) - 0xBF
+        $FF1A(NR30) - 0x7F
+        $FF1B(NR31) - 0xFF
+        $FF1C(NR32) - 0x9F
+        $FF1D(NR33) - No Change
+        $FF1E(NR34) - 0xBF
+        $FF1F(NR40) - No Change
+        $FF20(NR41) - 0xFF
+        $FF21(NR42) - 0x00
+        $FF22(NR43) - 0x00
+        $FF23(NR44) - 0xBF
+        $FF24(NR50) - 0x77
+        $FF25(NR51) - 0xF3
+        $FF26(NR52) - SEE BELOW
+    */
 
-    square1_counter = 0;
-    square1_wave_counter = 0;
-
-    square2_counter = 0;
-    square2_wave_counter = 0;
+    WriteReg(0x00, 0x80);
+    WriteReg(0x01, 0xBF);
+    WriteReg(0x02, 0xF3);
+    WriteReg(0x04, 0xBF);
+    WriteReg(0x06, 0x3F);
+    WriteReg(0x07, 0x00);
+    WriteReg(0x09, 0xBF);
+    WriteReg(0x0A, 0x7F);
+    WriteReg(0x0B, 0xFF);
+    WriteReg(0x0C, 0x9F);
+    WriteReg(0x0E, 0xBF);
+    WriteReg(0x10, 0xFF);
+    WriteReg(0x11, 0x00);
+    WriteReg(0x12, 0x00);
+    WriteReg(0x13, 0xBF);
+    WriteReg(0x14, 0x77);
+    WriteReg(0x15, 0xF3);
 }
 
 void GB_DMGClass::CalcSubCounter()
 {
-    sub_counter = (clockspeed / samplerate) / 4;
+    sub_counter = (clockspeed / samplerate) >> 2;
 }
