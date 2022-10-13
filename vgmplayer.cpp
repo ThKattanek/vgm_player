@@ -13,7 +13,7 @@
 #include "vgmplayer.h"
 #include "./gunzip.h"
 
-#define GB_DMG_TEST
+// #define GB_DMG_TEST
 
 VGMPlayer::VGMPlayer()
 {
