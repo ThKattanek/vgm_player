@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>366</width>
-    <height>636</height>
+    <width>375</width>
+    <height>738</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -23,6 +23,42 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="OscilloscopeWidget" name="oscilloscope" native="true"/>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="sn76489_group">
+      <property name="title">
+       <string>SN76489 Control</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Stereo Strength:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSlider" name="sn76489_stereo_slider">
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="value">
+          <number>0</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="sn76489_stereo_spin">
+         <property name="maximum">
+          <double>100.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </item>
     <item>
      <widget class="QGroupBox" name="groupBox">
@@ -94,8 +130,8 @@
      <widget class="QPlainTextEdit" name="log_output">
       <property name="font">
        <font>
-        <weight>75</weight>
-        <bold>true</bold>
+        <pointsize>8</pointsize>
+        <bold>false</bold>
        </font>
       </property>
       <property name="styleSheet">
@@ -116,8 +152,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>366</width>
-     <height>20</height>
+     <width>375</width>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

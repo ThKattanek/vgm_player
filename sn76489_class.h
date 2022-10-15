@@ -5,7 +5,7 @@
 //                                              //
 // #file: sn76489_class.h                       //
 //                                              //
-// last changes at 02-14-2020                   //
+// last changes at 10-15-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -26,7 +26,11 @@ public:
     void SetClockSpeed(uint32_t clockspeed);
     void SetSampleRate(uint32_t samplerate);
     void WriteReg(uint8_t value);
-    float GetNextSample();
+	void CalcNextSample();
+	void SetStereoControl(uint8_t stereo_control);
+	void SetStereoStrength(float stereo_strength);
+	float GetSampleLeft();
+	float GetSampleRight();
 
 private:
     void CalcSubCounter();
@@ -57,6 +61,9 @@ private:
     float   tone2_attenuation;
     float   tone3_attenuation;
     float   noise_attenuation;
+
+	uint8_t	stereo_control;
+	float stereo_strength;			// 0.0f = maximal stereo effect 1.0f = no stereo effekt
 
     uint16_t shift_reg;
     bool     white_noise;
