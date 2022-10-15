@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.cpp                         //
 //                                              //
-// last changes at 06-23-2020                   //
+// last changes at 10-15-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -276,9 +276,9 @@ void VGMPlayer::GetNextSample(float *sample_left, float *sample_right)
 
         if(is_SN76489_enabled)
         {
-            float sample = sn76489.GetNextSample();
-            current_left_output_sample += sample;
-            current_right_output_sample += sample;
+			sn76489.CalcNextSample();
+			current_left_output_sample += sn76489.GetSampleLeft();
+			current_right_output_sample += sn76489.GetSampleRight();
         }
 
         if(is_YM2612_enable)
@@ -328,7 +328,12 @@ void VGMPlayer::SetPlay(bool playing)
         {
             sample_counter = 0;
         }
-    }
+	}
+}
+
+void VGMPlayer::Set_SN76489_StereoStrength(float stereo_strength)
+{
+	sn76489.SetStereoStrength(stereo_strength);
 }
 
 bool VGMPlayer::ExportStreamingData(QString filename)
@@ -464,12 +469,24 @@ void VGMPlayer::ExecuteNextStreamCommand()
     uint16_t value16;
     uint8_t value8;
 
+	QString channelControl;
+
     switch(command)
     {
     // 0x4F dd    : Game Gear PSG stereo, write dd to port 0x06
     case 0x4f:
+		value8 = streaming_data[streaming_pos];
+		sn76489.SetStereoControl(value8);
         streaming_pos += 1;
-        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
+		channelControl = (value8 & 0x80) ? "0" : " ";
+		channelControl += (value8 & 0x40) ? "1" : " ";
+		channelControl += (value8 & 0x20) ? "2" : " ";
+		channelControl += (value8 & 0x10) ? "N" : " ";
+		channelControl += (value8 & 0x08) ? "0" : " ";
+		channelControl += (value8 & 0x04) ? "1" : " ";
+		channelControl += (value8 & 0x02) ? "2" : " ";
+		channelControl += (value8 & 0x01) ? "N" : " ";
+		qDebug() << "Game Gear PSG Stereo Control - " << channelControl;
         break;
     // 0x50 dd    : PSG (SN76489/SN76496) write value dd
     case 0x50:
@@ -788,6 +805,7 @@ void VGMPlayer::AnalyzingStreamForSoundchips()
 void VGMPlayer::InitSN76489()
 {
     sn76489.SetClockSpeed(sn76489_clock);
+	sn76489.SetStereoControl(0xff);
 }
 
 void VGMPlayer::InitYM2612()

@@ -5,13 +5,16 @@
 //                                              //
 // #file: mainwindow.cpp                        //
 //                                              //
-// last changes at 06-22-2020                   //
+// last changes at 10-15-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
+#include <QStyle>
+#include <QDesktopWidget>
 
 #define SAMPLERATE 44100
 
@@ -23,6 +26,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setWindowTitle("VGM Player - by Thorsten Kattanek");
 
+	setGeometry( QStyle::alignedRect( Qt::LeftToRight, Qt::AlignCenter,size(),  qApp->desktop()->availableGeometry()));
+
+
     LogText("VGM Player - by Thorsten Kattanek\n");
 
     ui->oscilloscope->setFixedSize(10*40, 8*40);
@@ -31,6 +37,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->oscilloscope->SetTriggerTyp(TRIGGER_TYP::RISING_EDGE);
     ui->oscilloscope->SetTriggerLevel(0);
     ui->oscilloscope->SetVoltPerDivision(0.25f);
+
+	ui->sn76489_stereo_slider->setValue(75);
 
     InitAudio();
 }
@@ -175,3 +183,17 @@ void MainWindow::on_gb_write_reg_clicked()
 {
     vgm_player.WriteGBDMGRegister(ui->gb_reg_num->value(), ui->gb_reg_value->value());
 }
+
+void MainWindow::on_sn76489_stereo_slider_valueChanged(int value)
+{
+	ui->sn76489_stereo_spin->setValue(value);
+	vgm_player.Set_SN76489_StereoStrength((100-value)/100.0f);
+}
+
+
+void MainWindow::on_sn76489_stereo_spin_valueChanged(double value)
+{
+	ui->sn76489_stereo_slider->setValue(value);
+	vgm_player.Set_SN76489_StereoStrength((100-value)/100.0f);
+}
+

@@ -5,7 +5,7 @@
 //                                              //
 // #file: sn76489_class.cpp                     //
 //                                              //
-// last changes at 02-15-2020                   //
+// last changes at 10-15-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -33,6 +33,9 @@ SN76489Class::SN76489Class()
     tone1_attenuation = 0.0f;
     tone2_attenuation = 0.0f;
     tone3_attenuation = 0.0f;
+
+	stereo_control = 0xff;
+	stereo_strength = 0.75f;
 
     white_noise = false;
     noise_counter = 0.0f;
@@ -112,7 +115,7 @@ void SN76489Class::WriteReg(uint8_t value)
     }
 }
 
-float SN76489Class::GetNextSample()
+void SN76489Class::CalcNextSample()
 {
     // tone channels
     tone1_counter -= sub_counter_tone;
@@ -151,12 +154,60 @@ float SN76489Class::GetNextSample()
         if(noise_counter >= 1.0f)
             StepNoiseGerator();
     }
-
+/*
 #ifndef EMU_ATTENUATION
     return  tone1_output + tone2_output + tone3_output + noise_output;
 #else
     return  tone1_output * tone1_attenuation + tone2_output * tone2_attenuation + tone3_output * tone3_attenuation + noise_output * noise_attenuation;
 #endif
+*/
+}
+
+void SN76489Class::SetStereoControl(uint8_t stereo_control)
+{
+	this->stereo_control = stereo_control;
+}
+
+void SN76489Class::SetStereoStrength(float stereo_strength)
+{
+	if(stereo_strength < 0.0f)
+		stereo_strength = 0.0f;
+	if(stereo_strength > 1.0f)
+		stereo_strength = 1.0f;
+
+	this->stereo_strength = stereo_strength;
+}
+
+float SN76489Class::GetSampleLeft()
+{
+	uint8_t channels = stereo_control >> 4;
+	#ifndef EMU_ATTENUATION
+	return  ((channels & 0x08) ? tone1_output : tone1_output * stereo_strength) + \
+			((channels & 0x04) ? tone2_output : tone2_output * stereo_strength) + \
+			((channels & 0x02) ? tone3_output : tone3_output * stereo_strength) + \
+			((channels & 0x01) ? noise_output : noise_output * stereo_strength);
+	#else
+		return  ((channels & 0x08) ? tone1_output * tone1_attenuation : tone1_output * tone1_attenuation * stereo_strength) + \
+				((channels & 0x04) ? tone2_output * tone2_attenuation : tone2_output * tone2_attenuation * stereo_strength) + \
+				((channels & 0x02) ? tone3_output * tone3_attenuation : tone3_output * tone3_attenuation * stereo_strength) + \
+				((channels & 0x01) ? noise_output * noise_attenuation : noise_output * noise_attenuation * stereo_strength);
+	#endif
+}
+
+float SN76489Class::GetSampleRight()
+{
+	uint8_t channels = stereo_control;
+	#ifndef EMU_ATTENUATION
+	return  ((channels & 0x08) ? tone1_output : tone1_output * stereo_strength) + \
+			((channels & 0x04) ? tone2_output : tone2_output * stereo_strength) + \
+			((channels & 0x02) ? tone3_output : tone3_output * stereo_strength) + \
+			((channels & 0x01) ? noise_output : noise_output * stereo_strength);
+	#else
+		return  ((channels & 0x08) ? tone1_output * tone1_attenuation : tone1_output * tone1_attenuation * stereo_strength) + \
+				((channels & 0x04) ? tone2_output * tone2_attenuation : tone2_output * tone2_attenuation * stereo_strength) + \
+				((channels & 0x02) ? tone3_output * tone3_attenuation : tone3_output * tone3_attenuation * stereo_strength) + \
+				((channels & 0x01) ? noise_output * noise_attenuation : noise_output * noise_attenuation * stereo_strength);
+	#endif
 }
 
 void SN76489Class::CalcSubCounter()

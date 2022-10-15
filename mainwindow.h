@@ -5,7 +5,7 @@
 //                                              //
 // #file: mainwindow.h                          //
 //                                              //
-// last changes at 06-21-2020                   //
+// last changes at 10-15-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -46,6 +46,10 @@ private slots:
     void OnFillAudioData(char *data, qint64 len);
 
     void on_gb_write_reg_clicked();
+
+	void on_sn76489_stereo_slider_valueChanged(int value);
+
+	void on_sn76489_stereo_spin_valueChanged(double arg1);
 
 private:
     Ui::MainWindow *ui;
