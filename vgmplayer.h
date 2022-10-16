@@ -100,6 +100,18 @@ private:
     uint32_t streaming_data_length;
     uint32_t streaming_pos;
 
+	QString gd3_trackname_en;
+	QString gd3_trackname_jp;
+	QString gd3_gamename_en;
+	QString gd3_gamename_jp;
+	QString gd3_systemname_en;
+	QString gd3_systemname_jp;
+	QString gd3_trackautor_en;
+	QString gd3_trackautor_jp;
+	QString gd3_releasedate;
+	QString gd3_convertername;
+	QString gd3_notes;
+
     bool    is_SN76489_written;
     bool    is_YM2612_written;
     bool    is_GB_DMG_written;
