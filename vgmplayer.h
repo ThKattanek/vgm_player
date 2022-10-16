@@ -56,6 +56,7 @@ public:
     void WriteGBDMGRegister(uint8_t reg_nr, uint8_t value);
 
 private:
+	void ReadGD3Tag(QString filename, int gd3_tag_offset);
     void ExecuteNextStreamCommand();
     void AnalyzingStreamForSoundchips();
     void InitSN76489();

@@ -217,6 +217,11 @@ bool VGMPlayer::Open(QString filename)
 
     file.close();
 
+	if(gd3_tag_offset != 0)
+	{
+		ReadGD3Tag(filename, gd3_tag_offset);
+	}
+
     if(is_compressed)
     {
         // temporary file delete
@@ -460,7 +465,12 @@ uint32_t VGMPlayer::GetStreamingPos()
 
 void VGMPlayer::WriteGBDMGRegister(uint8_t reg_nr, uint8_t value)
 {
-    gbdmg.WriteReg(reg_nr, value);
+	gbdmg.WriteReg(reg_nr, value);
+}
+
+void VGMPlayer::ReadGD3Tag(QString filename, int gd3_tag_offset)
+{
+
 }
 
 void VGMPlayer::ExecuteNextStreamCommand()
