@@ -5,7 +5,7 @@
 //                                              //
 // #file: mainwindow.cpp                        //
 //                                              //
-// last changes at 10-15-2022                   //
+// last changes at 10-17-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -24,10 +24,14 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+	ui->gd3_tag_table->setColumnWidth(0,500);
+
+	for(int i=0; i<7; i++)
+		ui->gd3_tag_table->setItem(i,0, new QTableWidgetItem());
+
     this->setWindowTitle("VGM Player - by Thorsten Kattanek");
 
 	setGeometry( QStyle::alignedRect( Qt::LeftToRight, Qt::AlignCenter,size(),  qApp->desktop()->availableGeometry()));
-
 
     LogText("VGM Player - by Thorsten Kattanek\n");
 
@@ -112,7 +116,21 @@ void MainWindow::ReleaseAudio()
 {
     disconnect(m_audiogen, SIGNAL(FillAudioData(char*, qint64)), this, SLOT(OnFillAudioData(char*, qint64)));
     m_audioOutput->stop();
-    delete m_audioOutput;
+	delete m_audioOutput;
+}
+
+void MainWindow::FillGD3TagTable()
+{
+	if(vgm_player.isOpen())
+	{
+		ui->gd3_tag_table->item(0,0)->setText(vgm_player.gd3_trackname_en);
+		ui->gd3_tag_table->item(1,0)->setText(vgm_player.gd3_gamename_en);
+		ui->gd3_tag_table->item(2,0)->setText(vgm_player.gd3_systemname_en);
+		ui->gd3_tag_table->item(3,0)->setText(vgm_player.gd3_trackautor_en);
+		ui->gd3_tag_table->item(4,0)->setText(vgm_player.gd3_releasedate);
+		ui->gd3_tag_table->item(5,0)->setText(vgm_player.gd3_convertername);
+		ui->gd3_tag_table->item(6,0)->setText(vgm_player.gd3_notes);
+	}
 }
 
 void MainWindow::OnFillAudioData(char *data, qint64 len)
@@ -157,6 +175,8 @@ void MainWindow::on_actionOpen_triggered()
         LogText("- YM2151 Clock: " + QString::number(vgm_player.GetYM2151Clock()) + " Hz");
         LogText("- GameBoy DMG Clock: " + QString::number(vgm_player.GetGB_DMGClock()) + " Hz");
         LogText("- VGM Data Offset: 0x" + QString::number(vgm_player.GetVGMDataOffset(),16));
+
+		FillGD3TagTable();
     }
 }
 

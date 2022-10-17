@@ -28,10 +28,9 @@ public:
     void SetSampleRate(uint32_t samplerate);
     void GetNextSample(float *sample_left, float *sample_right);
     void SetPlay(bool playing);
-
 	void Set_SN76489_StereoStrength(float stereo_strength);
-
     bool ExportStreamingData(QString filename);
+	void WriteGBDMGRegister(uint8_t reg_nr, uint8_t value);
 
     int64_t GetFileSize();
     uint32_t GetEOFOffset();
@@ -52,8 +51,6 @@ public:
     uint32_t GetGB_DMGClock();
     uint32_t GetCurrentSamplesCount();
     uint32_t GetStreamingPos();
-
-    void WriteGBDMGRegister(uint8_t reg_nr, uint8_t value);
 
 	QString gd3_trackname_en;
 	QString gd3_trackname_jp;
