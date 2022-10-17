@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.cpp                         //
 //                                              //
-// last changes at 10-15-2022                   //
+// last changes at 10-17-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -215,7 +215,14 @@ bool VGMPlayer::Open(QString filename)
     if(nbytes != streaming_data_length)
         qDebug() << "Error: failed streaming length.";
 
+	ReadGD3Tag(&file, gd3_tag_offset);
+
     file.close();
+
+	if(gd3_tag_offset != 0)
+	{
+		ReadGD3Tag(&file, gd3_tag_offset);
+	}
 
     if(is_compressed)
     {
@@ -460,7 +467,54 @@ uint32_t VGMPlayer::GetStreamingPos()
 
 void VGMPlayer::WriteGBDMGRegister(uint8_t reg_nr, uint8_t value)
 {
-    gbdmg.WriteReg(reg_nr, value);
+	gbdmg.WriteReg(reg_nr, value);
+}
+
+void VGMPlayer::ReadGD3Tag(QFile *file, int gd3_tag_offset)
+{
+	file->seek(gd3_tag_offset);
+
+	char gd3_identifier[5] = "    ";
+	uint32_t gd3_version;
+	uint32_t gd3_size;
+
+	file->read(gd3_identifier, 4);
+
+	QStringList gd3_tag_string_list;
+
+	if(QString(gd3_identifier) == "Gd3 ")
+	{
+		qDebug() << "GD3 Tag is found ...";
+		file->read((char*)&gd3_version, 4);
+		if(gd3_version == 0x00000100)
+		{
+			file->read((char*)&gd3_size, 4);
+			QByteArray gd3_tag = file->read(gd3_size);
+
+			int i = gd3_size;
+			while(i >= 0)
+			{
+				auto str = QString::fromUtf16(reinterpret_cast<const ushort*>(gd3_tag.constData()));
+				i -= (str.size() + 1) * 2;
+				gd3_tag = gd3_tag.right(i);
+				gd3_tag_string_list << str;
+			}
+
+			gd3_trackname_en = gd3_tag_string_list[0];
+			gd3_trackname_jp = gd3_tag_string_list[1];
+			gd3_gamename_en = gd3_tag_string_list[2];
+			gd3_gamename_jp = gd3_tag_string_list[3];
+			gd3_systemname_en = gd3_tag_string_list[4];
+			gd3_systemname_jp = gd3_tag_string_list[5];
+			gd3_trackautor_en = gd3_tag_string_list[6];
+			gd3_trackautor_jp = gd3_tag_string_list[7];
+			gd3_releasedate = gd3_tag_string_list[8];
+			gd3_convertername = gd3_tag_string_list[9];
+			gd3_notes = gd3_tag_string_list[10];
+		}
+		else
+			qDebug() << "Unknow gd3 tag version number.";
+	}
 }
 
 void VGMPlayer::ExecuteNextStreamCommand()

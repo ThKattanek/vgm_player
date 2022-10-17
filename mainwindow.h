@@ -5,7 +5,7 @@
 //                                              //
 // #file: mainwindow.h                          //
 //                                              //
-// last changes at 10-15-2022                   //
+// last changes at 10-17-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -42,13 +42,9 @@ private slots:
     void on_actionOpen_triggered();
     void on_actionE_xit_triggered();
     void on_action_Export_Streaming_Data_triggered();
-
     void OnFillAudioData(char *data, qint64 len);
-
     void on_gb_write_reg_clicked();
-
 	void on_sn76489_stereo_slider_valueChanged(int value);
-
 	void on_sn76489_stereo_spin_valueChanged(double arg1);
 
 private:
@@ -58,6 +54,7 @@ private:
     void LogText(const QString text);
     void InitAudio();
     void ReleaseAudio();
+	void FillGD3TagTable();
 
     unsigned int bufferSize;
     QAudioDeviceInfo m_device;

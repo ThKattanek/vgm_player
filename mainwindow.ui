@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>375</width>
-    <height>738</height>
+    <height>713</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -23,6 +23,71 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="OscilloscopeWidget" name="oscilloscope" native="true"/>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>230</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>GD3 Tag</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QTableWidget" name="gd3_tag_table">
+         <attribute name="verticalHeaderMinimumSectionSize">
+          <number>18</number>
+         </attribute>
+         <attribute name="verticalHeaderDefaultSectionSize">
+          <number>18</number>
+         </attribute>
+         <row>
+          <property name="text">
+           <string>Track Name:</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Game Name:</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>System Name:</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Track Author:</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Date:</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Converter Name:</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Notes:</string>
+          </property>
+         </row>
+         <column>
+          <property name="text">
+           <string/>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </item>
     <item>
      <widget class="QGroupBox" name="sn76489_group">

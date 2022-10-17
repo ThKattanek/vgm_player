@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.h                           //
 //                                              //
-// last changes at 10-15-2022                   //
+// last changes at 10-17-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -28,10 +28,9 @@ public:
     void SetSampleRate(uint32_t samplerate);
     void GetNextSample(float *sample_left, float *sample_right);
     void SetPlay(bool playing);
-
 	void Set_SN76489_StereoStrength(float stereo_strength);
-
     bool ExportStreamingData(QString filename);
+	void WriteGBDMGRegister(uint8_t reg_nr, uint8_t value);
 
     int64_t GetFileSize();
     uint32_t GetEOFOffset();
@@ -53,9 +52,20 @@ public:
     uint32_t GetCurrentSamplesCount();
     uint32_t GetStreamingPos();
 
-    void WriteGBDMGRegister(uint8_t reg_nr, uint8_t value);
+	QString gd3_trackname_en;
+	QString gd3_trackname_jp;
+	QString gd3_gamename_en;
+	QString gd3_gamename_jp;
+	QString gd3_systemname_en;
+	QString gd3_systemname_jp;
+	QString gd3_trackautor_en;
+	QString gd3_trackautor_jp;
+	QString gd3_releasedate;
+	QString gd3_convertername;
+	QString gd3_notes;
 
 private:
+	void ReadGD3Tag(QFile *file, int gd3_tag_offset);
     void ExecuteNextStreamCommand();
     void AnalyzingStreamForSoundchips();
     void InitSN76489();
