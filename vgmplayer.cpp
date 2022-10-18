@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.cpp                         //
 //                                              //
-// last changes at 10-17-2022                   //
+// last changes at 10-18-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -13,7 +13,7 @@
 #include "vgmplayer.h"
 #include "./gunzip.h"
 
-// #define GB_DMG_TEST
+//#define GB_DMG_TEST
 
 VGMPlayer::VGMPlayer()
 {
@@ -29,12 +29,6 @@ VGMPlayer::VGMPlayer()
 
 #ifdef GB_DMG_TEST
     gbdmg.SetClockSpeed(4194304);
-    gbdmg.WriteReg(0x01, 2<<6);
-    gbdmg.WriteReg(0x06, 2<<6);
-    /*
-    gbdmg.WriteReg(0x03, 0);
-    gbdmg.WriteReg(0x04, 0);
-    */
 #endif
 }
 

@@ -5,7 +5,7 @@
 //                                              //
 // #file: gb_dmg_class.cpp                      //
 //                                              //
-// last changes at 06-23-2020                   //
+// last changes at 10-18-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -24,7 +24,10 @@ GB_DMGClass::GB_DMGClass()
     square_duty_table[2] = 0x3C;    // 50%
     square_duty_table[3] = 0xf3;    // 75%
 
-    Reset();
+	counter_frame_sequencer = 1.0f;
+	frame_sequencer = 0;
+
+	Reset();
 }
 
 GB_DMGClass::~GB_DMGClass()
@@ -53,7 +56,11 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
         break;
     case 0x11:
         NR11 = value;
-        square1_length_counter = value & 0x3f;
+		square1_length_counter = (64 - (value & 0x3f));
+		if(square1_length_counter == 0)
+			square1_enable = false;
+		else
+			square1_enable = true;
         square1_duty = value >> 6;
         break;
     case 0x12:
@@ -61,15 +68,19 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
         break;
     case 0x13:
         NR13 = value;
-        square1_start_counter = 2048-( NR13 | (NR14 & 0x07) << 8);
+		square1_start_counter = 2048 - ( NR13 | ((NR14 & 0x07) << 8));
         break;
     case 0x14:
         NR14 = value;
-        square1_start_counter = 2048-( NR13 | (NR14 & 0x07) << 8);
+		square1_start_counter = 2048 - ( NR13 | ((NR14 & 0x07) << 8));
         break;
     case 0x16:
         NR21 = value;
-        square2_length_counter = value & 0x3f;
+		square2_length_counter = (64 - (value & 0x3f));
+		if(square2_length_counter == 0)
+			square2_enable = true;
+		else
+			square2_enable = true;
         square2_duty = value >> 6;
         break;
     case 0x17:
@@ -132,36 +143,92 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
 float GB_DMGClass::GetNextSample()
 {
     //Sqaure1
-    square1_counter -= sub_counter;
-    if(square1_counter <= 0)
+	square1_counter -= sub_counter_square;
+	if(square1_counter <= 0.0f)
     {
         square1_counter += square1_start_counter;
 
-        if(square_duty_table[square1_duty] & (1 << (7 - square1_wave_counter)))
-            square1_out = 0.25f;
-        else
-            square1_out = -0.25f;
+		if(square1_enable)
+		{
+			if(square_duty_table[square1_duty] & (1 << (7 - square1_wave_counter)))
+				square1_out = 0.25f;
+			else
+				square1_out = -0.25f;
+		}
+		else
+			square1_out = 0.0f;
 
         square1_wave_counter++;
         square1_wave_counter &= 0x07;
     }
 
-    //Sqaure2
-    square2_counter -= sub_counter;
-    if(square2_counter <= 0)
-    {
-        square2_counter += square2_start_counter;
+	//Sqaure2
+	square2_counter -= sub_counter_square;
+	if(square2_counter <= 0.0f)
+	{
+		square2_counter += square2_start_counter;
 
-        if(square_duty_table[square2_duty] & (1 << (7 - square2_wave_counter)))
-            square2_out = 0.25f;
-        else
-            square2_out = -0.25f;
+		if(square2_enable)
+		{
+			if(square_duty_table[square2_duty] & (1 << (7 - square2_wave_counter)))
+				square2_out = 0.25f;
+			else
+				square2_out = -0.25f;
+		}
+		else
+			square2_out = 0.0f;
 
-        square2_wave_counter++;
-        square2_wave_counter &= 0x07;
-    }
+		square2_wave_counter++;
+		square2_wave_counter &= 0x07;
+	}
 
-    return square1_out + square2_out;
+	// Framesequenzer 512 Hz
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	counter_frame_sequencer -= sub_counter_frame_sequencer;
+	if(counter_frame_sequencer <= 0.0f)
+	{
+		counter_frame_sequencer += 1.0f;
+
+		frame_sequencer++;
+
+		if(frame_sequencer & 1)
+		{
+			// 256 Hz
+
+			if(NR14 & 0x40) // Enable length counter 1
+			{
+				if(square1_length_counter > 0)
+				{
+					square1_length_counter--;
+					if(square1_length_counter == 0)
+						square1_enable = false;
+				}
+			}
+
+			if(NR24 & 0x40) // Enable length counter 2
+			{
+				if(square2_length_counter > 0)
+				{
+					square2_length_counter--;
+					if(square2_length_counter == 0)
+						square2_enable = false;
+				}
+			}
+		}
+
+		if((frame_sequencer & 2) && !((frame_sequencer-1) & 2))
+		{
+			// 128 Hz
+		}
+
+		if((frame_sequencer & 4) && !((frame_sequencer-1) & 4))
+		{
+			// 64 Hz
+		}
+	}
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	return square1_out + square2_out;
 }
 
 void GB_DMGClass::Reset()
@@ -193,26 +260,45 @@ void GB_DMGClass::Reset()
         $FF26(NR52) - SEE BELOW
     */
 
-    WriteReg(0x00, 0x80);
-    WriteReg(0x01, 0xBF);
-    WriteReg(0x02, 0xF3);
-    WriteReg(0x04, 0xBF);
-    WriteReg(0x06, 0x3F);
-    WriteReg(0x07, 0x00);
-    WriteReg(0x09, 0xBF);
-    WriteReg(0x0A, 0x7F);
-    WriteReg(0x0B, 0xFF);
-    WriteReg(0x0C, 0x9F);
-    WriteReg(0x0E, 0xBF);
-    WriteReg(0x10, 0xFF);
-    WriteReg(0x11, 0x00);
-    WriteReg(0x12, 0x00);
-    WriteReg(0x13, 0xBF);
-    WriteReg(0x14, 0x77);
-    WriteReg(0x15, 0xF3);
+	WriteReg(0x00, 0x80);
+	WriteReg(0x01, 0xBF);
+	WriteReg(0x02, 0xF3);
+	WriteReg(0x04, 0xBF);
+	WriteReg(0x06, 0x3F);
+	WriteReg(0x07, 0x00);
+	WriteReg(0x09, 0xBF);
+	WriteReg(0x0A, 0x7F);
+	WriteReg(0x0B, 0xFF);
+	WriteReg(0x0C, 0x9F);
+	WriteReg(0x0E, 0xBF);
+	WriteReg(0x10, 0xFF);
+	WriteReg(0x11, 0x00);
+	WriteReg(0x12, 0x00);
+	WriteReg(0x13, 0xBF);
+	WriteReg(0x14, 0x77);
+	WriteReg(0x15, 0xF3);
+
+//	WriteReg(0x00, 0x00);
+//	WriteReg(0x01, 0x00);
+//	WriteReg(0x02, 0x00);
+//	WriteReg(0x04, 0x00);
+//	WriteReg(0x06, 0x00);
+//	WriteReg(0x07, 0x00);
+//	WriteReg(0x09, 0x00);
+//	WriteReg(0x0A, 0x00);
+//	WriteReg(0x0B, 0x00);
+//	WriteReg(0x0C, 0x00);
+//	WriteReg(0x0E, 0x00);
+//	WriteReg(0x10, 0x00);
+//	WriteReg(0x11, 0x00);
+//	WriteReg(0x12, 0x00);
+//	WriteReg(0x13, 0x00);
+//	WriteReg(0x14, 0x00);
+//	WriteReg(0x15, 0x00);
 }
 
 void GB_DMGClass::CalcSubCounter()
 {
-    sub_counter = (clockspeed / samplerate) >> 2;
+	sub_counter_square = ((float)clockspeed / (float)samplerate) / 4.0f;
+	sub_counter_frame_sequencer = (512.0f / (float)samplerate);
 }
