@@ -5,7 +5,7 @@
 //                                              //
 // #file: gb_dmg_class.h                        //
 //                                              //
-// last changes at 10-18-2022                   //
+// last changes at 10-20-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -53,6 +53,7 @@ private:
 
     // Internal Registers
     uint8_t square_duty_table[4];
+	float volume_out_table[16];
 
     // Squre1
     uint16_t square1_start_counter;
@@ -63,6 +64,9 @@ private:
 
     uint8_t square1_length_counter;
 	bool square1_enable;
+
+	uint8_t square1_volume_counter;
+	uint8_t square1_current_volume;
 
     float square1_out;
 
@@ -75,6 +79,9 @@ private:
 
     uint8_t square2_length_counter;
 	bool square2_enable;
+
+	uint8_t square2_volume_counter;
+	uint8_t square2_current_volume;
 
 	float square2_out;
 

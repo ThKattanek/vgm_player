@@ -5,7 +5,7 @@
 //                                              //
 // #file: gb_dmg_class.cpp                      //
 //                                              //
-// last changes at 10-18-2022                   //
+// last changes at 10-20-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -23,6 +23,23 @@ GB_DMGClass::GB_DMGClass()
     square_duty_table[1] = 0x0C;    // 25%
     square_duty_table[2] = 0x3C;    // 50%
     square_duty_table[3] = 0xf3;    // 75%
+
+	volume_out_table[0] = 0.0f;
+	volume_out_table[1] = 0.07f;
+	volume_out_table[2] = 0.13f;
+	volume_out_table[3] = 0.2f;
+	volume_out_table[4] = 0.27f;
+	volume_out_table[5] = 0.33f;
+	volume_out_table[6] = 0.4f;
+	volume_out_table[7] = 0.47f;
+	volume_out_table[8] = 0.53f;
+	volume_out_table[9] = 0.6f;
+	volume_out_table[10] = 0.67f;
+	volume_out_table[11] = 0.73f;
+	volume_out_table[12] = 0.8f;
+	volume_out_table[13] = 0.87f;
+	volume_out_table[14] = 0.93f;
+	volume_out_table[15] = 1.0f;
 
 	counter_frame_sequencer = 1.0f;
 	frame_sequencer = 0;
@@ -57,10 +74,12 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
     case 0x11:
         NR11 = value;
 		square1_length_counter = (64 - (value & 0x3f));
+		/*
 		if(square1_length_counter == 0)
 			square1_enable = false;
 		else
 			square1_enable = true;
+			*/
         square1_duty = value >> 6;
         break;
     case 0x12:
@@ -73,14 +92,25 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
     case 0x14:
         NR14 = value;
 		square1_start_counter = 2048 - ( NR13 | ((NR14 & 0x07) << 8));
+		if(value & 0x80)
+		{
+			// Trigger Event
+			square1_enable = true;
+			if(square1_length_counter == 0) square1_length_counter = 64;
+			square1_counter = square1_start_counter;
+			square1_current_volume = NR12 >> 4;
+			square1_volume_counter = NR12 & 0x07;
+		}
         break;
     case 0x16:
         NR21 = value;
 		square2_length_counter = (64 - (value & 0x3f));
+		/*
 		if(square2_length_counter == 0)
-			square2_enable = true;
+			square2_enable = false;
 		else
 			square2_enable = true;
+			*/
         square2_duty = value >> 6;
         break;
     case 0x17:
@@ -93,6 +123,15 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
     case 0x19:
         NR24 = value;
         square2_start_counter = 2048-( NR23 | (NR24 & 0x07) << 8);
+		if(value & 0x80)
+		{
+			// Trigger Event
+			square2_enable = true;
+			if(square2_length_counter == 0) square2_length_counter = 64;
+			square2_counter = square2_start_counter;
+			square2_current_volume = NR22 >> 4;
+			square2_volume_counter = NR22 & 0x07;
+		}
         break;
     case 0x1A:
         NR30 = value;
@@ -200,7 +239,7 @@ float GB_DMGClass::GetNextSample()
 				if(square1_length_counter > 0)
 				{
 					square1_length_counter--;
-					if(square1_length_counter == 0)
+					if(square1_length_counter >= 0)
 						square1_enable = false;
 				}
 			}
@@ -210,7 +249,7 @@ float GB_DMGClass::GetNextSample()
 				if(square2_length_counter > 0)
 				{
 					square2_length_counter--;
-					if(square2_length_counter == 0)
+					if(square2_length_counter >= 0)
 						square2_enable = false;
 				}
 			}
@@ -224,15 +263,56 @@ float GB_DMGClass::GetNextSample()
 		if((frame_sequencer & 4) && !((frame_sequencer-1) & 4))
 		{
 			// 64 Hz
+			if((NR12 & 0x07) > 0)
+			{
+				// Volume sweep for channel 1 is enalable
+				square1_volume_counter--;
+				if(square1_volume_counter == 0)
+				{
+					square1_volume_counter = NR12 & 0x07;
+
+					if((NR12 & 0x08) && square1_current_volume < 15)
+					{
+						square1_current_volume++;
+					}
+
+					if(!(NR12 & 0x08) && square1_current_volume > 0)
+					{
+						square1_current_volume--;
+					}
+				}
+			}
+
+			if((NR22 & 0x07) > 0)
+			{
+				// Volume sweep for channel 2 is enalable
+				square2_volume_counter--;
+				if(square2_volume_counter == 0)
+				{
+					square2_volume_counter = NR22 & 0x07;
+
+					if((NR22 & 0x08) && square2_current_volume < 15)
+					{
+						square2_current_volume++;
+					}
+
+					if(!(NR22 & 0x08) && square2_current_volume > 0)
+					{
+						square2_current_volume--;
+					}
+				}
+			}
 		}
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	return square1_out + square2_out;
+	//return square1_out  + square2_out ;
+	return square1_out * volume_out_table[square1_current_volume & 0x0f] + square2_out * volume_out_table[square2_current_volume & 0x0f];
 }
 
 void GB_DMGClass::Reset()
 {
+	square1_enable = square2_enable = false;
     /*
      * Initial Register Values
         $FF10(NR10) - 0x80
