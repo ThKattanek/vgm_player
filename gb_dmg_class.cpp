@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////
 //                                              //
-// GB DMG emulation                             //
+// GB DMG emulation (Game Boy Sound)            //
 // by thorsten kattanek                         //
 //                                              //
 // #file: gb_dmg_class.cpp                      //
 //                                              //
-// last changes at 10-20-2022                   //
+// last changes at 10-21-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -41,6 +41,14 @@ GB_DMGClass::GB_DMGClass()
 	volume_out_table[14] = 0.93f;
 	volume_out_table[15] = 1.0f;
 
+	for(int i=0; i<15; i++)
+		dac_sample_table[i] = i * 0.0357143f - 0.25f;
+
+	volume_channel3_table[0] = 0.0f / 2.0f;
+	volume_channel3_table[1] = 1.0f / 2.0f;
+	volume_channel3_table[2] = 0.5f / 2.0f;
+	volume_channel3_table[3] = 0.25 / 2.0f;
+
 	counter_frame_sequencer = 1.0f;
 	frame_sequencer = 0;
 
@@ -73,80 +81,80 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
         break;
     case 0x11:
         NR11 = value;
-		square1_length_counter = (64 - (value & 0x3f));
-		/*
-		if(square1_length_counter == 0)
-			square1_enable = false;
-		else
-			square1_enable = true;
-			*/
-        square1_duty = value >> 6;
+		channel1_length_counter = (64 - (value & 0x3f));
+		channel1_duty = value >> 6;
         break;
     case 0x12:
         NR12 = value;
         break;
     case 0x13:
         NR13 = value;
-		square1_start_counter = 2048 - ( NR13 | ((NR14 & 0x07) << 8));
+		channel1_frequency = (2048 - ( NR13 | ((NR14 & 0x07) << 8))) * 4;
         break;
     case 0x14:
         NR14 = value;
-		square1_start_counter = 2048 - ( NR13 | ((NR14 & 0x07) << 8));
+		channel1_frequency = (2048 - ( NR13 | ((NR14 & 0x07) << 8))) * 4;
 		if(value & 0x80)
 		{
 			// Trigger Event
-			square1_enable = true;
-			if(square1_length_counter == 0) square1_length_counter = 64;
-			square1_counter = square1_start_counter;
-			square1_current_volume = NR12 >> 4;
-			square1_volume_counter = NR12 & 0x07;
+			channel1_enable = true;
+			if(channel1_length_counter == 0) channel1_length_counter = 63;
+			channel1_counter = channel1_frequency;
+			channel1_current_volume = NR12 >> 4;
+			channel1_volume_counter = NR12 & 0x07;
 		}
         break;
     case 0x16:
         NR21 = value;
-		square2_length_counter = (64 - (value & 0x3f));
-		/*
-		if(square2_length_counter == 0)
-			square2_enable = false;
-		else
-			square2_enable = true;
-			*/
-        square2_duty = value >> 6;
+		channel2_length_counter = (64 - (value & 0x3f));
+		channel2_duty = value >> 6;
         break;
     case 0x17:
         NR22 = value;
         break;
     case 0x18:
         NR23 = value;
-        square2_start_counter = 2048-( NR23 | (NR24 & 0x07) << 8);
+		channel2_frequency = (2048 - ( NR23 | ((NR24 & 0x07) << 8))) * 4;
         break;
     case 0x19:
         NR24 = value;
-        square2_start_counter = 2048-( NR23 | (NR24 & 0x07) << 8);
+		channel2_frequency = (2048 - ( NR23 | ((NR24 & 0x07) << 8))) * 4;
 		if(value & 0x80)
 		{
 			// Trigger Event
-			square2_enable = true;
-			if(square2_length_counter == 0) square2_length_counter = 64;
-			square2_counter = square2_start_counter;
-			square2_current_volume = NR22 >> 4;
-			square2_volume_counter = NR22 & 0x07;
+			channel2_enable = true;
+			if(channel2_length_counter == 0) channel2_length_counter = 63;
+			channel2_counter = channel2_frequency;
+			channel2_current_volume = NR22 >> 4;
+			channel2_volume_counter = NR22 & 0x07;
 		}
         break;
     case 0x1A:
-        NR30 = value;
+		NR30 = value;
         break;
     case 0x1B:
         NR31 = value;
+		channel3_length_counter = 256 - value;
         break;
     case 0x1C:
         NR32 = value;
+		channel3_volume = volume_channel3_table[(NR32 >> 5) & 0x03];
         break;
     case 0x1D:
         NR33 = value;
+		channel3_frequency = (2048 - ( NR33 | ((NR34 & 0x07) << 8))) * 2;
         break;
     case 0x1E:
         NR34 = value;
+		channel3_frequency = (2048 - ( NR33 | ((NR34 & 0x07) << 8))) * 2;
+		if(value & 0x80)
+		{
+			// Trigger Event
+			channel3_enable = true;
+			if(channel3_length_counter == 0) channel3_length_counter = 255;
+			channel3_counter = channel3_frequency;
+			sample_position_counter = 0;
+		}
         break;
     case 0x20:
         NR41 = value;
@@ -171,7 +179,7 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
         break;
     case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
     case 0x38: case 0x39: case 0x3A: case 0x3B: case 0x3C: case 0x3D: case 0x3E: case 0x3F:
-        WAVE_TABLE[(reg_nr - 0x20)] = value;
+		sample_buffer[(reg_nr - 0x20)] = value;
         break;
     default:
         qDebug() << "Not Supported register!";
@@ -181,44 +189,68 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
 
 float GB_DMGClass::GetNextSample()
 {
-    //Sqaure1
-	square1_counter -= sub_counter_square;
-	if(square1_counter <= 0.0f)
+	// channel1 [square]
+	channel1_counter -= sub_counter_square;
+	if(channel1_counter <= 0.0f)
     {
-        square1_counter += square1_start_counter;
+		channel1_counter += channel1_frequency;
 
-		if(square1_enable)
+		if(channel1_enable)
 		{
-			if(square_duty_table[square1_duty] & (1 << (7 - square1_wave_counter)))
-				square1_out = 0.25f;
+			if(square_duty_table[channel1_duty] & (1 << (7 - channel1_wave_counter)))
+				channel1_out = 0.25f;
 			else
-				square1_out = -0.25f;
+				channel1_out = -0.25f;
 		}
 		else
-			square1_out = 0.0f;
+			channel1_out = 0.0f;
 
-        square1_wave_counter++;
-        square1_wave_counter &= 0x07;
+		channel1_wave_counter++;
+		channel1_wave_counter &= 0x07;
     }
 
-	//Sqaure2
-	square2_counter -= sub_counter_square;
-	if(square2_counter <= 0.0f)
+	// channel2 [square]
+	channel2_counter -= sub_counter_square;
+	if(channel2_counter <= 0.0f)
 	{
-		square2_counter += square2_start_counter;
+		channel2_counter += channel2_frequency;
 
-		if(square2_enable)
+		if(channel2_enable)
 		{
-			if(square_duty_table[square2_duty] & (1 << (7 - square2_wave_counter)))
-				square2_out = 0.25f;
+			if(square_duty_table[channel2_duty] & (1 << (7 - channel2_wave_counter)))
+				channel2_out = 0.25f;
 			else
-				square2_out = -0.25f;
+				channel2_out = -0.25f;
 		}
 		else
-			square2_out = 0.0f;
+			channel2_out = 0.0f;
 
-		square2_wave_counter++;
-		square2_wave_counter &= 0x07;
+		channel2_wave_counter++;
+		channel2_wave_counter &= 0x07;
+	}
+
+	// channle3 [wave]
+	channel3_counter -= sub_counter_square;
+	if(channel3_counter <= 0.0f)
+	{
+		channel3_counter += channel3_frequency;
+
+		if(channel3_enable)
+		{
+			// next sample from
+			if(sample_position_counter & 1)
+				channel3_out = dac_sample_table[sample_buffer[sample_position_counter >> 1] & 0x0f];
+			else
+				channel3_out = dac_sample_table[sample_buffer[sample_position_counter >> 1] >> 4];
+		}
+		else
+			channel3_out = 0.0f;
+
+		if(~NR30 & 0x80)
+			channel3_out = 0.0f;
+
+		sample_position_counter++;
+		sample_position_counter &= 0x1f;
 	}
 
 	// Framesequenzer 512 Hz
@@ -236,21 +268,31 @@ float GB_DMGClass::GetNextSample()
 
 			if(NR14 & 0x40) // Enable length counter 1
 			{
-				if(square1_length_counter > 0)
+				if(channel1_length_counter > 0)
 				{
-					square1_length_counter--;
-					if(square1_length_counter >= 0)
-						square1_enable = false;
+					channel1_length_counter--;
+					if(channel1_length_counter >= 0)
+						channel1_enable = false;
 				}
 			}
 
 			if(NR24 & 0x40) // Enable length counter 2
 			{
-				if(square2_length_counter > 0)
+				if(channel2_length_counter > 0)
 				{
-					square2_length_counter--;
-					if(square2_length_counter >= 0)
-						square2_enable = false;
+					channel2_length_counter--;
+					if(channel2_length_counter >= 0)
+						channel2_enable = false;
+				}
+			}
+
+			if(NR34 & 0x40) // Enable length counter 3
+			{
+				if(channel3_length_counter > 0)
+				{
+					channel3_length_counter--;
+					if(channel3_length_counter >= 0)
+						channel3_enable = false;
 				}
 			}
 		}
@@ -266,19 +308,19 @@ float GB_DMGClass::GetNextSample()
 			if((NR12 & 0x07) > 0)
 			{
 				// Volume sweep for channel 1 is enalable
-				square1_volume_counter--;
-				if(square1_volume_counter == 0)
+				channel1_volume_counter--;
+				if(channel1_volume_counter == 0)
 				{
-					square1_volume_counter = NR12 & 0x07;
+					channel1_volume_counter = NR12 & 0x07;
 
-					if((NR12 & 0x08) && square1_current_volume < 15)
+					if((NR12 & 0x08) && channel1_current_volume < 15)
 					{
-						square1_current_volume++;
+						channel1_current_volume++;
 					}
 
-					if(!(NR12 & 0x08) && square1_current_volume > 0)
+					if(!(NR12 & 0x08) && channel1_current_volume > 0)
 					{
-						square1_current_volume--;
+						channel1_current_volume--;
 					}
 				}
 			}
@@ -286,19 +328,19 @@ float GB_DMGClass::GetNextSample()
 			if((NR22 & 0x07) > 0)
 			{
 				// Volume sweep for channel 2 is enalable
-				square2_volume_counter--;
-				if(square2_volume_counter == 0)
+				channel2_volume_counter--;
+				if(channel2_volume_counter == 0)
 				{
-					square2_volume_counter = NR22 & 0x07;
+					channel2_volume_counter = NR22 & 0x07;
 
-					if((NR22 & 0x08) && square2_current_volume < 15)
+					if((NR22 & 0x08) && channel2_current_volume < 15)
 					{
-						square2_current_volume++;
+						channel2_current_volume++;
 					}
 
-					if(!(NR22 & 0x08) && square2_current_volume > 0)
+					if(!(NR22 & 0x08) && channel2_current_volume > 0)
 					{
-						square2_current_volume--;
+						channel2_current_volume--;
 					}
 				}
 			}
@@ -306,39 +348,14 @@ float GB_DMGClass::GetNextSample()
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	//return square1_out  + square2_out ;
-	return square1_out * volume_out_table[square1_current_volume & 0x0f] + square2_out * volume_out_table[square2_current_volume & 0x0f];
+	return channel1_out * volume_out_table[channel1_current_volume & 0x0f] + channel2_out * volume_out_table[channel2_current_volume & 0x0f] + channel3_out * channel3_volume;
 }
 
 void GB_DMGClass::Reset()
 {
-	square1_enable = square2_enable = false;
-    /*
-     * Initial Register Values
-        $FF10(NR10) - 0x80
-        $FF11(NR11) - 0xBF
-        $FF12(NR12) - 0xF3
-        $FF13(NR13) - No Change
-        $FF14(NR14) - 0xBF
-        $FF15(NR20) - No Change
-        $FF16(NR21) - 0x3F
-        $FF17(NR22) - 0x00
-        $FF18(NR23) - No Change
-        $FF19(NR24) - 0xBF
-        $FF1A(NR30) - 0x7F
-        $FF1B(NR31) - 0xFF
-        $FF1C(NR32) - 0x9F
-        $FF1D(NR33) - No Change
-        $FF1E(NR34) - 0xBF
-        $FF1F(NR40) - No Change
-        $FF20(NR41) - 0xFF
-        $FF21(NR42) - 0x00
-        $FF22(NR43) - 0x00
-        $FF23(NR44) - 0xBF
-        $FF24(NR50) - 0x77
-        $FF25(NR51) - 0xF3
-        $FF26(NR52) - SEE BELOW
-    */
+	channel1_enable = channel2_enable = channel3_enable = channel4_enable = false;
+
+	channel1_out = channel2_out = channel3_out = 0.0f;
 
 	WriteReg(0x00, 0x80);
 	WriteReg(0x01, 0xBF);
@@ -357,28 +374,10 @@ void GB_DMGClass::Reset()
 	WriteReg(0x13, 0xBF);
 	WriteReg(0x14, 0x77);
 	WriteReg(0x15, 0xF3);
-
-//	WriteReg(0x00, 0x00);
-//	WriteReg(0x01, 0x00);
-//	WriteReg(0x02, 0x00);
-//	WriteReg(0x04, 0x00);
-//	WriteReg(0x06, 0x00);
-//	WriteReg(0x07, 0x00);
-//	WriteReg(0x09, 0x00);
-//	WriteReg(0x0A, 0x00);
-//	WriteReg(0x0B, 0x00);
-//	WriteReg(0x0C, 0x00);
-//	WriteReg(0x0E, 0x00);
-//	WriteReg(0x10, 0x00);
-//	WriteReg(0x11, 0x00);
-//	WriteReg(0x12, 0x00);
-//	WriteReg(0x13, 0x00);
-//	WriteReg(0x14, 0x00);
-//	WriteReg(0x15, 0x00);
 }
 
 void GB_DMGClass::CalcSubCounter()
 {
-	sub_counter_square = ((float)clockspeed / (float)samplerate) / 4.0f;
+	sub_counter_square = ((float)clockspeed / (float)samplerate);
 	sub_counter_frame_sequencer = (512.0f / (float)samplerate);
 }

@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////
 //                                              //
-// GB DMG emulation                             //
+// GB DMG emulation (Game Boy Sound)            //
 // by thorsten kattanek                         //
 //                                              //
 // #file: gb_dmg_class.h                        //
 //                                              //
-// last changes at 10-20-2022                   //
+// last changes at 10-21-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -33,60 +33,80 @@ private:
     uint32_t clockspeed;        // as Hz
     uint32_t samplerate;        // as Hz
 
-    // Registers for Square 1
+	// registers for channel 1
     uint8_t NR10,NR11,NR12,NR13,NR14;
 
-    // Registers for Square 2
+	// registers for channel 2
     uint8_t NR21,NR22,NR23,NR24;
 
-    // Registers for Wave
+	// Registers for channel 3
     uint8_t NR30,NR31,NR32,NR33,NR34;
 
-    // Registers for Noise
+	// registers for channel 4
     uint8_t NR41,NR42,NR43,NR44;
 
-    // Registers for Controlls
+	// registers for controlls
     uint8_t NR50,NR51,NR52;
 
-    // Wavetable 16 Byte for 32 4-Bit Samples
-    uint8_t WAVE_TABLE[32];
+	///////////////////////////////////////////////////////
 
-    // Internal Registers
+	// internal Registers
     uint8_t square_duty_table[4];
 	float volume_out_table[16];
+	float dac_sample_table[16];
+	float volume_channel3_table[4];
 
-    // Squre1
-    uint16_t square1_start_counter;
-    uint8_t square1_duty;
+	// channel 1
+	uint16_t channel1_frequency;
+	uint8_t channel1_duty;
 
-	float square1_counter;
-    uint8_t square1_wave_counter;
+	float channel1_counter;
+	uint8_t channel1_wave_counter;
 
-    uint8_t square1_length_counter;
-	bool square1_enable;
+	uint8_t channel1_length_counter;
+	bool channel1_enable;
 
-	uint8_t square1_volume_counter;
-	uint8_t square1_current_volume;
+	uint8_t channel1_volume_counter;
+	uint8_t channel1_current_volume;
 
-    float square1_out;
+	float channel1_out;
 
-    // Squre2
-    uint16_t square2_start_counter;
-    uint8_t square2_duty;
+	// channel 2
+	uint16_t channel2_frequency;
+	uint8_t channel2_duty;
 
-	float square2_counter;
-    uint8_t square2_wave_counter;
+	float channel2_counter;
+	uint8_t channel2_wave_counter;
 
-    uint8_t square2_length_counter;
-	bool square2_enable;
+	uint8_t channel2_length_counter;
+	bool channel2_enable;
 
-	uint8_t square2_volume_counter;
-	uint8_t square2_current_volume;
+	uint8_t channel2_volume_counter;
+	uint8_t channel2_current_volume;
 
-	float square2_out;
+	float channel2_out;
+
+	// channel 3
+
+	// samplebuffer with 16 Byte for 32 4-Bit Samples
+	uint8_t sample_buffer[32];
+	uint8_t sample_position_counter;
+
+	uint16_t channel3_frequency;
+	float channel3_counter;
+
+	uint8_t channel3_length_counter;
+	bool channel3_enable;
+
+	float channel3_volume;
+	float channel3_out;
+
+	// channel 4
+	bool channel4_enable;
+
+	///////////////////////////////////////////////////////
 
 	float sub_counter_square;
-
 	float sub_counter_frame_sequencer;
 	float counter_frame_sequencer;
 
