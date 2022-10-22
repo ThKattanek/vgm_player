@@ -23,11 +23,11 @@ public:
 
     void SetClockSpeed(uint32_t clockspeed);
     void SetSampleRate(uint32_t samplerate);
-    void WriteReg(uint8_t reg_nr, uint8_t value);
+	void Reset();
+	void WriteReg(uint8_t reg_nr, uint8_t value);
     float GetNextSample();
 
 private:
-    void Reset();
     void CalcSubCounter();
 	uint16_t CalcNewFrequenyCh1();
 
@@ -53,6 +53,7 @@ private:
 
 	// internal Registers
     uint8_t square_duty_table[4];
+	uint8_t noise_divisor_table[8];
 	float volume_out_table[16];
 	float dac_sample_table[16];
 	float volume_channel3_table[4];
@@ -112,11 +113,28 @@ private:
 	float channel3_out;
 
 	// channel 4
+	uint16_t channel4_frequency;
+	float channel4_counter;
+
+	uint8_t noise_shift;
+	bool noise_width_mode;
+	uint8_t noise_divisor;
+
+	uint16_t lfsr;
+
+	uint8_t channel4_length_counter;
 	bool channel4_enable;
+
+	uint8_t channel4_volume_counter;
+	uint8_t channel4_current_volume;
+
+	float channel4_out;
 
 	///////////////////////////////////////////////////////
 
 	float sub_counter_square;
+	float sub_counter_wave;
+	float sub_counter_noise;
 	float sub_counter_frame_sequencer;
 	float counter_frame_sequencer;
 

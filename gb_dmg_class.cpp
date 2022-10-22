@@ -24,6 +24,15 @@ GB_DMGClass::GB_DMGClass()
     square_duty_table[2] = 0x3C;    // 50%
     square_duty_table[3] = 0xf3;    // 75%
 
+	noise_divisor_table[0] = 8;
+	noise_divisor_table[1] = 16;
+	noise_divisor_table[2] = 32;
+	noise_divisor_table[3] = 48;
+	noise_divisor_table[4] = 64;
+	noise_divisor_table[5] = 80;
+	noise_divisor_table[6] = 96;
+	noise_divisor_table[7] = 112;
+
 	volume_out_table[0] = 0.0f;
 	volume_out_table[1] = 0.07f;
 	volume_out_table[2] = 0.13f;
@@ -76,12 +85,12 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
 {
     switch(reg_nr + 0x10)
     {
+	//// CANNEL 1
     case 0x10:
         NR10 = value;
 		sweep_period = (NR10 & 0x70) >> 4;
 		sweep_negate = (NR10 & 0x08) >> 3;
 		sweep_shift = NR10 & 0x07;
-		qDebug() << "Sweep Period: " << sweep_period << ", Sweep Negate: " << sweep_negate << ", Sweep Shift: " << sweep_shift;
         break;
     case 0x11:
         NR11 = value;
@@ -126,6 +135,7 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
 			channel1_volume_counter = NR12 & 0x07;
 		}
         break;
+	//// CANNEL 2
     case 0x16:
         NR21 = value;
 		channel2_length_counter = (64 - (value & 0x3f));
@@ -151,6 +161,7 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
 			channel2_volume_counter = NR22 & 0x07;
 		}
         break;
+	//// CANNEL 3
     case 0x1A:
 		NR30 = value;
         break;
@@ -178,23 +189,42 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
 			sample_position_counter = 0;
 		}
         break;
+	//// CANNEL 4
     case 0x20:
         NR41 = value;
+		channel4_length_counter = (64 - (value & 0x3f));
         break;
     case 0x21:
         NR42 = value;
         break;
     case 0x22:
         NR43 = value;
+		noise_shift = NR43 >> 4;
+		noise_width_mode = (NR43 & 0x08) >> 3;
+		noise_divisor = NR43 & 0x07;
+		channel4_frequency = noise_divisor_table[noise_divisor] << noise_shift;
         break;
     case 0x23:
         NR44 = value;
+		if(value & 0x80)
+		{
+			// Trigger Event
+			channel4_enable = true;
+			channel4_counter = noise_divisor_table[noise_divisor] << noise_shift;
+			lfsr = 0x7fff;
+			if(channel4_length_counter == 0) channel4_length_counter = 63;
+			channel4_current_volume = NR42 >> 4;
+			channel4_volume_counter = NR42 & 0x07;
+		}
         break;
+	//// CONTROL
     case 0x24:
         NR50 = value;
+		qDebug() << "Panning: " << NR50;
         break;
     case 0x25:
         NR51 = value;
+		qDebug() << "Mixing: " << NR51;
         break;
     case 0x26:
         NR52 = value;
@@ -252,7 +282,7 @@ float GB_DMGClass::GetNextSample()
 	}
 
 	// channle3 [wave]
-	channel3_counter -= sub_counter_square;
+	channel3_counter -= sub_counter_wave;
 	if(channel3_counter <= 0.0f)
 	{
 		channel3_counter += channel3_frequency;
@@ -275,6 +305,40 @@ float GB_DMGClass::GetNextSample()
 		sample_position_counter &= 0x1f;
 	}
 
+	// channel4 [noise]
+
+	if(channel4_counter > 0.0f) channel4_counter -= sub_counter_noise;
+	if(channel4_counter <= 0.0f)
+	{
+		uint16_t xor_result;
+
+		channel4_counter += noise_divisor_table[noise_divisor] << noise_shift;
+
+		if(channel4_enable)
+		{
+			xor_result = (lfsr & 0b01) ^ ((lfsr & 0b10) >> 1);
+			lfsr = (lfsr >> 1) | (xor_result << 14);
+
+			lfsr &= 0x7fff;
+
+			if(noise_width_mode)
+			{
+				lfsr &= ~(1 << 6);
+				lfsr &= 0x7fff;
+
+				lfsr |= xor_result << 6;
+				lfsr &= 0x7fff;
+			}
+
+			if(~lfsr & 0x01)
+				channel4_out = 0.25f;
+			else
+				channel4_out = -0.25f;
+		}
+		else
+			channel4_out = 0.0f;
+	}
+
 	// Framesequenzer 512 Hz
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	counter_frame_sequencer -= sub_counter_frame_sequencer;
@@ -293,7 +357,7 @@ float GB_DMGClass::GetNextSample()
 				if(channel1_length_counter > 0)
 				{
 					channel1_length_counter--;
-					if(channel1_length_counter >= 0)
+					if(channel1_length_counter == 0)
 						channel1_enable = false;
 				}
 			}
@@ -303,7 +367,7 @@ float GB_DMGClass::GetNextSample()
 				if(channel2_length_counter > 0)
 				{
 					channel2_length_counter--;
-					if(channel2_length_counter >= 0)
+					if(channel2_length_counter == 0)
 						channel2_enable = false;
 				}
 			}
@@ -313,8 +377,18 @@ float GB_DMGClass::GetNextSample()
 				if(channel3_length_counter > 0)
 				{
 					channel3_length_counter--;
-					if(channel3_length_counter >= 0)
+					if(channel3_length_counter == 0)
 						channel3_enable = false;
+				}
+			}
+
+			if(NR44 & 0x40) // Enable length counter 4
+			{
+				if(channel4_length_counter > 0)
+				{
+					channel4_length_counter--;
+					if(channel4_length_counter == 0)
+						channel4_enable = false;
 				}
 			}
 		}
@@ -338,7 +412,7 @@ float GB_DMGClass::GetNextSample()
 
 					if((new_frequency <= 2047) && (sweep_shift > 0))
 					{
-						channel1_frequency = new_frequency;
+						channel1_counter = channel1_frequency = new_frequency;
 						sweep_shadow_frequency = new_frequency;
 
 						CalcNewFrequenyCh1();
@@ -389,29 +463,53 @@ float GB_DMGClass::GetNextSample()
 					}
 				}
 			}
+
+			if((NR42 & 0x07) > 0)
+			{
+				// Volume sweep for channel 2 is enalable
+				channel4_volume_counter--;
+				if(channel4_volume_counter == 0)
+				{
+					channel4_volume_counter = NR42 & 0x07;
+
+					if((NR42 & 0x08) && channel4_current_volume < 15)
+					{
+						channel4_current_volume++;
+					}
+
+					if(!(NR42 & 0x08) && channel4_current_volume > 0)
+					{
+						channel4_current_volume--;
+					}
+				}
+			}
 		}
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	float sound_mix = channel1_out * volume_out_table[channel1_current_volume & 0x0f] + channel2_out * volume_out_table[channel2_current_volume & 0x0f] + channel3_out * channel3_volume;
+	float sound_mix = (channel1_out * volume_out_table[channel1_current_volume & 0x0f]) + (channel2_out * volume_out_table[channel2_current_volume & 0x0f]) + (channel3_out * channel3_volume) + (channel4_out * volume_out_table[channel4_current_volume & 0x0f]);
 
+	//// High Pass Filter
 	static float capacitor1 = 0.5f;
 
 	float sound_out = sound_mix - capacitor1;
 	capacitor1 = sound_mix - sound_out * 0.999958;
+	////
 
 	return sound_out;
 }
 
 void GB_DMGClass::Reset()
 {
+	channel1_counter = channel2_counter = channel3_counter = channel4_counter = 0.0f;
 	channel1_enable = channel2_enable = channel3_enable = channel4_enable = false;
-	channel1_out = channel2_out = channel3_out = 0.0f;
+	channel1_out = channel2_out = channel3_out = channel4_out = 0.0f;
 
 	sweep_timer = 0;
 	sweep_enable = false;
 	sweep_shadow_frequency = 0;
 
+	/*
 	WriteReg(0x00, 0x80);
 	WriteReg(0x01, 0xBF);
 	WriteReg(0x02, 0xF3);
@@ -429,11 +527,32 @@ void GB_DMGClass::Reset()
 	WriteReg(0x13, 0xBF);
 	WriteReg(0x14, 0x77);
 	WriteReg(0x15, 0xF3);
+	*/
+
+	WriteReg(0x00, 0x00);
+	WriteReg(0x01, 0x00);
+	WriteReg(0x02, 0x00);
+	WriteReg(0x04, 0x00);
+	WriteReg(0x06, 0x00);
+	WriteReg(0x07, 0x00);
+	WriteReg(0x09, 0x00);
+	WriteReg(0x0A, 0x00);
+	WriteReg(0x0B, 0x00);
+	WriteReg(0x0C, 0x00);
+	WriteReg(0x0E, 0x00);
+	WriteReg(0x10, 0x00);
+	WriteReg(0x11, 0x00);
+	WriteReg(0x12, 0x00);
+	WriteReg(0x13, 0x00);
+	WriteReg(0x14, 0x00);
+	WriteReg(0x15, 0x00);
 }
 
 void GB_DMGClass::CalcSubCounter()
 {
 	sub_counter_square = ((float)clockspeed / (float)samplerate);
+	sub_counter_wave = ((float)(clockspeed) / (float)samplerate);
+	sub_counter_noise = ((float)(clockspeed) / (float)samplerate);
 	sub_counter_frame_sequencer = (512.0f / (float)samplerate);
 }
 

@@ -864,4 +864,5 @@ void VGMPlayer::InitYM2612()
 void VGMPlayer::InitGBDMG()
 {
     gbdmg.SetClockSpeed(gb_dmg_clock);
+	gbdmg.Reset();
 }
