@@ -5,7 +5,7 @@
 //                                              //
 // #file: gb_dmg_class.cpp                      //
 //                                              //
-// last changes at 10-21-2022                   //
+// last changes at 10-22-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -78,6 +78,10 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
     {
     case 0x10:
         NR10 = value;
+		sweep_period = (NR10 & 0x70) >> 4;
+		sweep_negate = (NR10 & 0x08) >> 3;
+		sweep_shift = NR10 & 0x07;
+		qDebug() << "Sweep Period: " << sweep_period << ", Sweep Negate: " << sweep_negate << ", Sweep Shift: " << sweep_shift;
         break;
     case 0x11:
         NR11 = value;
@@ -98,6 +102,24 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
 		{
 			// Trigger Event
 			channel1_enable = true;
+
+			// Sweep
+			sweep_shadow_frequency = (2048 - ( NR13 | ((NR14 & 0x07) << 8))) * 4;
+
+			if(sweep_period == 0)
+				sweep_timer = 8;
+			else
+				sweep_timer = sweep_period;
+
+			if((sweep_period != 0) || (sweep_shift != 0))
+				sweep_enable = true;
+			else
+				sweep_enable = false;
+
+			if(sweep_shift != 0)
+				CalcNewFrequenyCh1();
+			//
+
 			if(channel1_length_counter == 0) channel1_length_counter = 63;
 			channel1_counter = channel1_frequency;
 			channel1_current_volume = NR12 >> 4;
@@ -300,6 +322,29 @@ float GB_DMGClass::GetNextSample()
 		if((frame_sequencer & 2) && !((frame_sequencer-1) & 2))
 		{
 			// 128 Hz
+			if(sweep_timer > 0)
+				sweep_timer--;
+
+			if(sweep_timer == 0)
+			{
+				if(sweep_period > 0)
+					sweep_timer = sweep_period;
+				else
+					sweep_timer = 8;
+
+				if(sweep_enable && (sweep_period > 0))
+				{
+					new_frequency = CalcNewFrequenyCh1();
+
+					if((new_frequency <= 2047) && (sweep_shift > 0))
+					{
+						channel1_frequency = new_frequency;
+						sweep_shadow_frequency = new_frequency;
+
+						CalcNewFrequenyCh1();
+					}
+				}
+			}
 		}
 
 		if((frame_sequencer & 4) && !((frame_sequencer-1) & 4))
@@ -348,14 +393,24 @@ float GB_DMGClass::GetNextSample()
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	return channel1_out * volume_out_table[channel1_current_volume & 0x0f] + channel2_out * volume_out_table[channel2_current_volume & 0x0f] + channel3_out * channel3_volume;
+	float sound_mix = channel1_out * volume_out_table[channel1_current_volume & 0x0f] + channel2_out * volume_out_table[channel2_current_volume & 0x0f] + channel3_out * channel3_volume;
+
+	static float capacitor1 = 0.5f;
+
+	float sound_out = sound_mix - capacitor1;
+	capacitor1 = sound_mix - sound_out * 0.999958;
+
+	return sound_out;
 }
 
 void GB_DMGClass::Reset()
 {
 	channel1_enable = channel2_enable = channel3_enable = channel4_enable = false;
-
 	channel1_out = channel2_out = channel3_out = 0.0f;
+
+	sweep_timer = 0;
+	sweep_enable = false;
+	sweep_shadow_frequency = 0;
 
 	WriteReg(0x00, 0x80);
 	WriteReg(0x01, 0xBF);
@@ -380,4 +435,19 @@ void GB_DMGClass::CalcSubCounter()
 {
 	sub_counter_square = ((float)clockspeed / (float)samplerate);
 	sub_counter_frame_sequencer = (512.0f / (float)samplerate);
+}
+
+uint16_t GB_DMGClass::CalcNewFrequenyCh1()
+{
+	uint16_t new_frequency = sweep_shadow_frequency >> sweep_shift;
+
+	if(sweep_negate)
+		new_frequency = sweep_shadow_frequency + new_frequency;
+	else
+		new_frequency = sweep_shadow_frequency - new_frequency;
+
+	if(new_frequency > 2047)
+		channel1_enable = false;
+
+	return new_frequency;
 }

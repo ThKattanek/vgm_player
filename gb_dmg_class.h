@@ -5,7 +5,7 @@
 //                                              //
 // #file: gb_dmg_class.h                        //
 //                                              //
-// last changes at 10-21-2022                   //
+// last changes at 10-22-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -29,6 +29,7 @@ public:
 private:
     void Reset();
     void CalcSubCounter();
+	uint16_t CalcNewFrequenyCh1();
 
     uint32_t clockspeed;        // as Hz
     uint32_t samplerate;        // as Hz
@@ -58,6 +59,7 @@ private:
 
 	// channel 1
 	uint16_t channel1_frequency;
+	uint16_t new_frequency;
 	uint8_t channel1_duty;
 
 	float channel1_counter;
@@ -68,6 +70,14 @@ private:
 
 	uint8_t channel1_volume_counter;
 	uint8_t channel1_current_volume;
+
+	uint8_t sweep_period;
+	bool	sweep_negate;
+	uint8_t	sweep_shift;
+
+	bool	sweep_enable;
+	uint16_t sweep_shadow_frequency;
+	uint8_t sweep_timer;
 
 	float channel1_out;
 
