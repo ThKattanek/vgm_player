@@ -44,10 +44,10 @@ GB_DMGClass::GB_DMGClass()
 	for(int i=0; i<15; i++)
 		dac_sample_table[i] = i * 0.0357143f - 0.25f;
 
-	volume_channel3_table[0] = 0.0f / 2.0f;
-	volume_channel3_table[1] = 1.0f / 2.0f;
-	volume_channel3_table[2] = 0.5f / 2.0f;
-	volume_channel3_table[3] = 0.25 / 2.0f;
+	volume_channel3_table[0] = 0.0f / 1.0f;
+	volume_channel3_table[1] = 1.0f / 1.0f;
+	volume_channel3_table[2] = 0.5f / 1.0f;
+	volume_channel3_table[3] = 0.25 / 1.0f;
 
 	counter_frame_sequencer = 1.0f;
 	frame_sequencer = 0;
