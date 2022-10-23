@@ -61,6 +61,7 @@ private:
 	float volume_out_table[16];
 	float dac_sample_table[16];
 	float volume_channel3_table[4];
+	float master_volume_table[8];
 
 	// channel 1
 	uint16_t channel1_frequency;

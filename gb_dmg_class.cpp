@@ -50,6 +50,15 @@ GB_DMGClass::GB_DMGClass()
 	volume_out_table[14] = 0.93f;
 	volume_out_table[15] = 1.0f;
 
+	master_volume_table[0] = 0.0f;
+	master_volume_table[1] = 0.142857f;
+	master_volume_table[2] = 0.285714f;
+	master_volume_table[3] = 0.428571f;
+	master_volume_table[4] = 0.571428f;
+	master_volume_table[5] = 0.714285f;
+	master_volume_table[6] = 0.857142f;
+	master_volume_table[7] = 1.0f;
+
 	for(int i=0; i<15; i++)
 		dac_sample_table[i] = i * 0.0357143f - 0.25f;
 
@@ -220,11 +229,9 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
 	//// CONTROL
     case 0x24:
         NR50 = value;
-		qDebug() << "Panning: " << NR50;
         break;
     case 0x25:
         NR51 = value;
-		qDebug() << "Mixing: " << NR51;
         break;
     case 0x26:
         NR52 = value;
@@ -234,7 +241,7 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
 		sample_buffer[(reg_nr - 0x20)] = value;
         break;
     default:
-        qDebug() << "Not Supported register!";
+		qDebug() << "GameBoy DMG: Not Supported register! (" << Qt::hex << (reg_nr + 0x10) << "<=" << value << ")";
         break;
 	}
 }
@@ -331,9 +338,9 @@ void GB_DMGClass::CalcNextSample()
 			}
 
 			if(~lfsr & 0x01)
-				channel4_out = 0.25f;
+				channel4_out = 0.15f;
 			else
-				channel4_out = -0.25f;
+				channel4_out = -0.15f;
 		}
 		else
 			channel4_out = 0.0f;
@@ -514,6 +521,9 @@ void GB_DMGClass::CalcNextSample()
 	if(NR51 & 0x08)
 		sample_right_out += ch4;
 
+	sample_left_out *= master_volume_table[(NR50 >> 4) & 0x07];
+	sample_right_out *= master_volume_table[NR50 & 0x07];
+
 	//// High Pass Filter
 
 //	static float capacitor1 = 0.5f;
@@ -542,25 +552,23 @@ void GB_DMGClass::Reset()
 	sweep_enable = false;
 	sweep_shadow_frequency = 0;
 
-	/*
-	WriteReg(0x00, 0x80);
-	WriteReg(0x01, 0xBF);
-	WriteReg(0x02, 0xF3);
-	WriteReg(0x04, 0xBF);
-	WriteReg(0x06, 0x3F);
-	WriteReg(0x07, 0x00);
-	WriteReg(0x09, 0xBF);
-	WriteReg(0x0A, 0x7F);
-	WriteReg(0x0B, 0xFF);
-	WriteReg(0x0C, 0x9F);
-	WriteReg(0x0E, 0xBF);
-	WriteReg(0x10, 0xFF);
-	WriteReg(0x11, 0x00);
-	WriteReg(0x12, 0x00);
-	WriteReg(0x13, 0xBF);
-	WriteReg(0x14, 0x77);
-	WriteReg(0x15, 0xF3);
-	*/
+//	WriteReg(0x00, 0x80);
+//	WriteReg(0x01, 0xBF);
+//	WriteReg(0x02, 0xF3);
+//	WriteReg(0x04, 0xBF);
+//	WriteReg(0x06, 0x3F);
+//	WriteReg(0x07, 0x00);
+//	WriteReg(0x09, 0xBF);
+//	WriteReg(0x0A, 0x7F);
+//	WriteReg(0x0B, 0xFF);
+//	WriteReg(0x0C, 0x9F);
+//	WriteReg(0x0E, 0xBF);
+//	WriteReg(0x10, 0xFF);
+//	WriteReg(0x11, 0x00);
+//	WriteReg(0x12, 0x00);
+//	WriteReg(0x13, 0xBF);
+//	WriteReg(0x14, 0x77);
+//	WriteReg(0x15, 0xF3);
 
 	WriteReg(0x00, 0x00);
 	WriteReg(0x01, 0x00);
