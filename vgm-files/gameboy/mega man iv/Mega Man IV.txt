@@ -1,0 +1,79 @@
+***********************************************
+* VGM music package                           *
+* http://vgmrips.net/                         *
+***********************************************
+Game name:           Mega Man IV (U, E) /
+                     Rockman World 4 (J)
+System:              Nintendo Game Boy
+Music hardware:      Game Boy DMG (LR35902)
+
+Music author:        Kouji Murata,
+                     Mari Yamaguchi,
+                     Minae Fujii,
+                     Takashi Tateishi
+Game developer:      Minakuchi Engineering
+Game publisher:      Capcom
+Game release date:   1993-12 (U) /
+                     1993-10-29 (J) /
+                     1993-12-31 (E)
+
+Package created by:  Yoshiatom
+Package version:     1.01
+
+Song list, in approximate game order:
+Song name                           Length:
+                                    Total  Loop
+01 Title / Opening                  1:04   1:04
+02 Password                         0:23   0:15
+03 Dr. Light Lab 1                  0:45   0:39
+04 Stage Select 1                   0:25   0:24
+05 Stage Start                      0:09   -
+06 Toad Man Stage                   0:38   0:29
+07 Bright Man Stage                 0:48   0:32
+08 Pharaoh Man Stage                0:44   0:37
+09 Ring Man Stage                   0:43   0:39
+10 Boss Battle (Mega Man 4)         0:18   0:18
+11 Stage Clear                      0:05   -
+12 Get a Weapon                     0:06   0:06
+13 Get Beat                         0:13   0:13
+14 Dr. Light Lab 2                  0:52   0:39
+15 Wily Station                     0:13   0:13
+16 Stage Select 2                   0:25   0:24
+17 Crystal Man Stage                0:51   0:51
+18 Napalm Man Stage                 0:51   0:45
+19 Stone Man Stage                  0:43   0:38
+20 Charge man Stage                 1:12   1:12
+21 Boss Battle (Mega Man 5)         0:40   0:30
+22 Ballade Battle / Escape          0:39   0:26
+23 Wily Battleship                  0:07   -
+24 Wily Battleship Stage            0:49   0:49
+25 Wily Robo Iron Golem             0:25   -
+26 Final Battle                     0:47   0:39
+27 All Clear                        0:12   -
+28 Ending 1                         1:20   0:53
+29 Ending 2                         1:09   1:09
+30 Game Over                        0:08   -
+31 Proto Man                        0:04   -
+32 Wily Station (unused variant)    0:16   0:13
+33 Final Battle (unused variant)    0:36   0:26
+34 Get Beat (unused variant)        0:26   0:26
+35 Dr. Light Lab (unused variant)   0:51   0:26
+
+Total Length                       19:56  35:49
+
+
+Notes:
+My first VGM Pack! vgmlpfnd is a gift from the
+gods.
+
+Track Names are used in Rockman Sound Box 2.
+
+This pack was made using MAME0164 VGM mod.
+
+
+Package history:
+1.00 2018-04-10 Yoshiatom: Initial release.
+1.01 2018-08-19 Yoshiatom: Fixed Charge Man
+ (along with the typo in the title), re-ordered
+ some of the tracks and removed the redundant
+ track notes.

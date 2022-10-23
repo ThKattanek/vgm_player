@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////
 //                                              //
-// GB DMG emulation                             //
+// GB DMG emulation (Game Boy Sound)            //
 // by thorsten kattanek                         //
 //                                              //
 // #file: gb_dmg_class.h                        //
 //                                              //
-// last changes at 06-23-2020                   //
+// last changes at 10-23-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -23,59 +23,131 @@ public:
 
     void SetClockSpeed(uint32_t clockspeed);
     void SetSampleRate(uint32_t samplerate);
-    void WriteReg(uint8_t reg_nr, uint8_t value);
-    float GetNextSample();
+	void Reset();
+	void WriteReg(uint8_t reg_nr, uint8_t value);
+	void CalcNextSample();
+	float GetSampleLeft();
+	float GetSampleRight();
+
+	//float GetNextSample();
 
 private:
-    void Reset();
     void CalcSubCounter();
+	uint16_t CalcNewFrequenyCh1();
 
     uint32_t clockspeed;        // as Hz
     uint32_t samplerate;        // as Hz
-    uint16_t sub_counter;
 
-    // Registers for Square 1
+	// registers for channel 1
     uint8_t NR10,NR11,NR12,NR13,NR14;
 
-    // Registers for Square 2
+	// registers for channel 2
     uint8_t NR21,NR22,NR23,NR24;
 
-    // Registers for Wave
+	// Registers for channel 3
     uint8_t NR30,NR31,NR32,NR33,NR34;
 
-    // Registers for Noise
+	// registers for channel 4
     uint8_t NR41,NR42,NR43,NR44;
 
-    // Registers for Controlls
+	// registers for controlls
     uint8_t NR50,NR51,NR52;
 
-    // Wavetable 16 Byte for 32 4-Bit Samples
-    uint8_t WAVE_TABLE[32];
+	///////////////////////////////////////////////////////
 
-    // Internal Registers
+	// internal Registers
     uint8_t square_duty_table[4];
+	uint8_t noise_divisor_table[8];
+	float volume_out_table[16];
+	float dac_sample_table[16];
+	float volume_channel3_table[4];
+	float master_volume_table[8];
 
-    // Squre1
-    uint16_t square1_start_counter;
-    uint8_t square1_duty;
+	// channel 1
+	uint16_t channel1_frequency;
+	uint16_t new_frequency;
+	uint8_t channel1_duty;
 
-    int16_t square1_counter;
-    uint8_t square1_wave_counter;
+	float channel1_counter;
+	uint8_t channel1_wave_counter;
 
-    uint8_t square1_length_counter;
+	uint8_t channel1_length_counter;
+	bool channel1_enable;
 
-    float square1_out;
+	uint8_t channel1_volume_counter;
+	uint8_t channel1_current_volume;
 
-    // Squre2
-    uint16_t square2_start_counter;
-    uint8_t square2_duty;
+	uint8_t sweep_period;
+	bool	sweep_negate;
+	uint8_t	sweep_shift;
 
-    int16_t square2_counter;
-    uint8_t square2_wave_counter;
+	bool	sweep_enable;
+	uint16_t sweep_shadow_frequency;
+	uint8_t sweep_timer;
 
-    uint8_t square2_length_counter;
+	float channel1_out;
 
-    float square2_out;
+	// channel 2
+	uint16_t channel2_frequency;
+	uint8_t channel2_duty;
+
+	float channel2_counter;
+	uint8_t channel2_wave_counter;
+
+	uint8_t channel2_length_counter;
+	bool channel2_enable;
+
+	uint8_t channel2_volume_counter;
+	uint8_t channel2_current_volume;
+
+	float channel2_out;
+
+	// channel 3
+
+	// samplebuffer with 16 Byte for 32 4-Bit Samples
+	uint8_t sample_buffer[32];
+	uint8_t sample_position_counter;
+
+	uint16_t channel3_frequency;
+	float channel3_counter;
+
+	uint8_t channel3_length_counter;
+	bool channel3_enable;
+
+	float channel3_volume;
+	float channel3_out;
+
+	// channel 4
+	uint16_t channel4_frequency;
+	float channel4_counter;
+
+	uint8_t noise_shift;
+	bool noise_width_mode;
+	uint8_t noise_divisor;
+
+	uint16_t lfsr;
+
+	uint8_t channel4_length_counter;
+	bool channel4_enable;
+
+	uint8_t channel4_volume_counter;
+	uint8_t channel4_current_volume;
+
+	float channel4_out;
+
+	///////////////////////////////////////////////////////
+
+	float sample_left_out;
+	float sample_right_out;
+
+	float sub_counter_square;
+	float sub_counter_wave;
+	float sub_counter_noise;
+	float sub_counter_frame_sequencer;
+	float counter_frame_sequencer;
+
+	uint8_t frame_sequencer;
+	uint8_t old_frame_sequencer;
 };
 
 #endif // GB_DMGCLASS_H
