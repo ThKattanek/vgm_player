@@ -522,11 +522,10 @@ void GB_DMGClass::CalcNextSample()
 	if(NR51 & 0x08)
 		right_out += ch4;
 
-	sample_left_out *= master_volume_table[(NR50 >> 4) & 0x07];
-	sample_right_out *= master_volume_table[NR50 & 0x07];
+	left_out *= master_volume_table[(NR50 >> 4) & 0x07];
+	right_out *= master_volume_table[NR50 & 0x07];
 
-	//// High Pass Filter
-
+	// High Pass Filter
 	static float cap_left = 0.5f;
 	static float cap_right = 0.5f;
 
@@ -535,7 +534,6 @@ void GB_DMGClass::CalcNextSample()
 
 	sample_right_out = right_out - cap_right;
 	cap_right = right_out - sample_right_out * 0.999958;
-
 }
 
 float GB_DMGClass::GetSampleLeft()
