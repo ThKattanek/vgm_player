@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.cpp                         //
 //                                              //
-// last changes at 10-18-2022                   //
+// last changes at 10-23-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -291,9 +291,9 @@ void VGMPlayer::GetNextSample(float *sample_left, float *sample_right)
 
         if(is_GB_DMG_enable)
         {
-            float sample = gbdmg.GetNextSample();
-            current_left_output_sample += sample;
-            current_right_output_sample += sample;
+			gbdmg.CalcNextSample();
+			current_left_output_sample += gbdmg.GetSampleLeft();
+			current_right_output_sample += gbdmg.GetSampleRight();
         }
 
         if(current_soundchip_count > 0)

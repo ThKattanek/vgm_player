@@ -5,7 +5,7 @@
 //                                              //
 // #file: gb_dmg_class.cpp                      //
 //                                              //
-// last changes at 10-22-2022                   //
+// last changes at 10-23-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -236,10 +236,10 @@ void GB_DMGClass::WriteReg(uint8_t reg_nr, uint8_t value)
     default:
         qDebug() << "Not Supported register!";
         break;
-    }
+	}
 }
 
-float GB_DMGClass::GetNextSample()
+void GB_DMGClass::CalcNextSample()
 {
 	// channel1 [square]
 	channel1_counter -= sub_counter_square;
@@ -487,16 +487,49 @@ float GB_DMGClass::GetNextSample()
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	float sound_mix = (channel1_out * volume_out_table[channel1_current_volume & 0x0f]) + (channel2_out * volume_out_table[channel2_current_volume & 0x0f]) + (channel3_out * channel3_volume) + (channel4_out * volume_out_table[channel4_current_volume & 0x0f]);
+	float ch1 = channel1_out * volume_out_table[channel1_current_volume & 0x0f];
+	float ch2 = channel2_out * volume_out_table[channel2_current_volume & 0x0f];
+	float ch3 = channel3_out * channel3_volume;
+	float ch4 = channel4_out * volume_out_table[channel4_current_volume & 0x0f];
+
+	sample_left_out = sample_right_out = 0.0f;
+
+	// LeftChannel
+	if(NR51 & 0x10)
+		sample_left_out += ch1;
+	if(NR51 & 0x20)
+		sample_left_out += ch2;
+	if(NR51 & 0x40)
+		sample_left_out += ch3;
+	if(NR51 & 0x80)
+		sample_left_out += ch4;
+
+	// RightChannel
+	if(NR51 & 0x01)
+		sample_right_out += ch1;
+	if(NR51 & 0x02)
+		sample_right_out += ch2;
+	if(NR51 & 0x04)
+		sample_right_out += ch3;
+	if(NR51 & 0x08)
+		sample_right_out += ch4;
 
 	//// High Pass Filter
-	static float capacitor1 = 0.5f;
 
-	float sound_out = sound_mix - capacitor1;
-	capacitor1 = sound_mix - sound_out * 0.999958;
-	////
+//	static float capacitor1 = 0.5f;
+//	float sound_out = sound_mix - capacitor1;
+//	capacitor1 = sound_mix - sound_out * 0.999958;
 
-	return sound_out;
+}
+
+float GB_DMGClass::GetSampleLeft()
+{
+	return sample_left_out;
+}
+
+float GB_DMGClass::GetSampleRight()
+{
+	return sample_right_out;
 }
 
 void GB_DMGClass::Reset()

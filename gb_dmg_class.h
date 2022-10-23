@@ -5,7 +5,7 @@
 //                                              //
 // #file: gb_dmg_class.h                        //
 //                                              //
-// last changes at 10-22-2022                   //
+// last changes at 10-23-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -25,7 +25,11 @@ public:
     void SetSampleRate(uint32_t samplerate);
 	void Reset();
 	void WriteReg(uint8_t reg_nr, uint8_t value);
-    float GetNextSample();
+	void CalcNextSample();
+	float GetSampleLeft();
+	float GetSampleRight();
+
+	//float GetNextSample();
 
 private:
     void CalcSubCounter();
@@ -131,6 +135,9 @@ private:
 	float channel4_out;
 
 	///////////////////////////////////////////////////////
+
+	float sample_left_out;
+	float sample_right_out;
 
 	float sub_counter_square;
 	float sub_counter_wave;
