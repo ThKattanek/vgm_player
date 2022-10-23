@@ -499,36 +499,42 @@ void GB_DMGClass::CalcNextSample()
 	float ch3 = channel3_out * channel3_volume;
 	float ch4 = channel4_out * volume_out_table[channel4_current_volume & 0x0f];
 
-	sample_left_out = sample_right_out = 0.0f;
+	float left_out, right_out;
+	left_out = right_out = 0.0f;
 
 	// LeftChannel
 	if(NR51 & 0x10)
-		sample_left_out += ch1;
+		left_out += ch1;
 	if(NR51 & 0x20)
-		sample_left_out += ch2;
+		left_out += ch2;
 	if(NR51 & 0x40)
-		sample_left_out += ch3;
+		left_out += ch3;
 	if(NR51 & 0x80)
-		sample_left_out += ch4;
+		left_out += ch4;
 
 	// RightChannel
 	if(NR51 & 0x01)
-		sample_right_out += ch1;
+		right_out += ch1;
 	if(NR51 & 0x02)
-		sample_right_out += ch2;
+		right_out += ch2;
 	if(NR51 & 0x04)
-		sample_right_out += ch3;
+		right_out += ch3;
 	if(NR51 & 0x08)
-		sample_right_out += ch4;
+		right_out += ch4;
 
 	sample_left_out *= master_volume_table[(NR50 >> 4) & 0x07];
 	sample_right_out *= master_volume_table[NR50 & 0x07];
 
 	//// High Pass Filter
 
-//	static float capacitor1 = 0.5f;
-//	float sound_out = sound_mix - capacitor1;
-//	capacitor1 = sound_mix - sound_out * 0.999958;
+	static float cap_left = 0.5f;
+	static float cap_right = 0.5f;
+
+	sample_left_out = left_out - cap_left;
+	cap_left = left_out - sample_left_out * 0.999958;
+
+	sample_right_out = right_out - cap_right;
+	cap_right = right_out - sample_right_out * 0.999958;
 
 }
 
