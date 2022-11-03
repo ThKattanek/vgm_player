@@ -1,52 +1,29 @@
-QT       += core gui multimedia
+#//////////////////////////////////////////////////
+#//                                              //
+#// vgm-player                                   //
+#// by thorsten kattanek                         //
+#//                                              //
+#// #file: vgm-player.pro                        //
+#//                                              //
+#// last changes at 11-02-2022                   //
+#// https://github.com/ThKattanek/vgm_player     //
+#//                                              //
+#//////////////////////////////////////////////////
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++11
+TEMPLATE = subdirs
 
-CONFIG += link_pkgconfig
+  SUBDIRS = src
 
-PKGCONFIG += zlib
+  emu64.subdir = src
 
-# The following define makes your compiler emit warnings if you use
-# any Qt feature that has been marked deprecated (the exact warnings
-# depend on your compiler). Please consult the documentation of the
-# deprecated API in order to know how to port your code away from it.
-DEFINES += QT_DEPRECATED_WARNINGS
+  CONFIG += ordered
 
-# You can also make your code fail to compile if it uses deprecated APIs.
-# In order to do so, uncomment the following line.
-# You can also select to disable deprecated APIs only up to a certain version of Qt.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
-SOURCES += \
-    gb_dmg_class.cpp \
-    main.cpp \
-    mainwindow.cpp \
-    sn76489_class.cpp \
-    vgmplayer.cpp \
-    ym2612_class.cpp \
-    audiogenerator.cpp \
-    widgets/oscilloscope_widget.cpp
-
-HEADERS += \
-    gb_dmg_class.h \
-    gunzip.h \
-    mainwindow.h \
-    sn76489_class.h \
-    vgmplayer.h \
-    ym2612_class.h \
-    audiogenerator.h \
-    widgets/oscilloscope_widget.h
-
-FORMS += \
-    mainwindow.ui \
-    widgets/oscilloscope_widget.ui
-
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
-
-RESOURCES += \
-    vgm_player.qrc
+# Example for more subdirs
+# SUBDIRS = src1\
+#            src2
+#
+# src1.subdir = src1
+# src2.subdir = src2
+#
+# app.depends = src1 src2
