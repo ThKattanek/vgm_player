@@ -66,19 +66,25 @@ if [ $i686_ok ]; then
         rm -rf $install_i686_dir/*
     fi
 
+    echo "Install Dir: "
+    echo $install_i686_dir
+    
+    mkdir $install_i686_dir
+    
     # compile ts files
     lrelease ../vgm_player.pro
     
     # execute qmake
     cd $build_i686_dir
     $i686_qmake PREFIX=$install_i686_dir ../..
-    make -j24 
+    make -j24
+    make install
     cd ..
     
-    #rm -rf $build_i686_dir
+    rm -rf $build_i686_dir
 
     # Convert Unicode to Windows
-    #echo "Convert Unicode TXT to Windows with awk..."
+    echo "Convert Unicode TXT to Windows with awk..."
     #mv $install_i686_dir/kommandozeilenparameter.txt $install_i686_dir/kommandozeilenparameter_unicode.txt
     #awk 'sub("$", "\r")' $install_i686_dir/kommandozeilenparameter_unicode.txt > $install_i686_dir/kommandozeilenparameter.txt
     #rm -f $install_i686_dir/kommandozeilenparameter_unicode.txt
@@ -114,6 +120,8 @@ if [ $x86_64_ok ]; then
         rm -rf $install_x86_64_dir/*
     fi
     
+    mkdir $install_x86_64_dir
+    
     # compile ts files
     lrelease ../vgm_player.pro
 
@@ -121,9 +129,10 @@ if [ $x86_64_ok ]; then
     cd $build_x86_64_dir
     $x86_64_qmake PREFIX=$install_x86_64_dir ../..
     make -j24 
+    make install
     cd ..
 
-    #rm -rf $build_x86_64_dir
+    rm -rf $build_x86_64_dir
 
     # Convert Unicode to Windows
     echo "Convert Unicode TXT to Windows with awk..."
