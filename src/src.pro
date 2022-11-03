@@ -63,12 +63,15 @@ DEFINES += DATA_PATH=\\\"$$PREFIX\\\"
 
 win32 {
     target.path = $$PREFIX
+    vgm-files.path = $$PREFIX/vgm-files
 } else {
     target.path = $$PREFIX/bin
+    vgm-files.path = $$PREFIX/share/$$TARGET/vgm-files
 }
 
 # VGM Demo Files
 vgm-files.CONFIG += nostrip
-vgm-files.files += ../vgm-files/sms*
+vgm-files.files += "../vgm-files/sms"
+vgm-files.files += "../vgm-files/gameboy"
 
 INSTALLS += target vgm-files
