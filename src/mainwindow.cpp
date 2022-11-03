@@ -44,6 +44,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 	ui->sn76489_stereo_slider->setValue(75);
 
+	// Hide DevTools
+	ui->gb_gmd_group->hide();
+	ui->sn76489_group->hide();
+
     InitAudio();
 }
 

@@ -126,7 +126,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QGroupBox" name="groupBox">
+     <widget class="QGroupBox" name="gb_gmd_group">
       <property name="title">
        <string>GameBoy GMD Controll</string>
       </property>
