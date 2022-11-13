@@ -13,6 +13,8 @@
 #include "vgmplayer.h"
 #include "./gunzip.h"
 
+#include <iostream>
+
 //#define GB_DMG_TEST
 
 VGMPlayer::VGMPlayer()
@@ -91,7 +93,10 @@ bool VGMPlayer::Open(QString filename)
 
             temp_filename = QDir::tempPath() + "/vgmplayer.tmp";
 
+			std::cout << "Marker 001" << std::endl;
+			std::cout << "Zlib Version: " << ZLIB_VERSION << std::endl;
             ret = gunzip(&strm, filename.toUtf8().data(), temp_filename.toUtf8().data(), 0);
+			std::cout << "Marker 002" << std::endl;
 
             inflateBackEnd(&strm);
         }
