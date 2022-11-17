@@ -14,6 +14,7 @@
 #define VGMPLAYER_H
 
 #include <QtCore>
+#include <zlib.h>
 #include "./sn76489_class.h"
 #include "./ym2612_class.h"
 #include "./gb_dmg_class.h"
@@ -65,7 +66,7 @@ public:
 	QString gd3_notes;
 
 private:
-	void ReadGD3Tag(QFile *file, int gd3_tag_offset);
+	void ReadGD3Tag(gzFile file, int gd3_tag_offset);
     void ExecuteNextStreamCommand();
     void AnalyzingStreamForSoundchips();
     void InitSN76489();

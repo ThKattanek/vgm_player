@@ -12,8 +12,6 @@
 
 #include "vgmplayer.h"
 
-#include <zlib.h>
-
 //#define GB_DMG_TEST
 
 VGMPlayer::VGMPlayer()
@@ -154,12 +152,12 @@ bool VGMPlayer::Open(QString filename)
 
 		//ReadGD3Tag(&file, gd3_tag_offset);
 
-		gzclose(file);
-
 		if(gd3_tag_offset != 0)
 		{
-			//ReadGD3Tag(&file, gd3_tag_offset);
+			ReadGD3Tag(file, gd3_tag_offset);
 		}
+
+		gzclose(file);
 
 		AnalyzingStreamForSoundchips();
 
@@ -403,27 +401,32 @@ void VGMPlayer::WriteGBDMGRegister(uint8_t reg_nr, uint8_t value)
 	gbdmg.WriteReg(reg_nr, value);
 }
 
-void VGMPlayer::ReadGD3Tag(QFile *file, int gd3_tag_offset)
+void VGMPlayer::ReadGD3Tag(gzFile file, int gd3_tag_offset)
 {
-
-	file->seek(gd3_tag_offset);
+	gzseek(file, gd3_tag_offset, SEEK_SET);
 
 	char gd3_identifier[5] = "    ";
 	uint32_t gd3_version;
 	uint32_t gd3_size;
 
-	file->read(gd3_identifier, 4);
+	QByteArray gd3_tag;
+	char* data;
+
+	gzread(file, gd3_identifier, 4);
 
 	QStringList gd3_tag_string_list;
 
 	if(QString(gd3_identifier) == "Gd3 ")
 	{
 		qDebug() << "GD3 Tag is found ...";
-		file->read((char*)&gd3_version, 4);
+		gzread(file, (char*)&gd3_version, 4);
 		if(gd3_version == 0x00000100)
 		{
-			file->read((char*)&gd3_size, 4);
-			QByteArray gd3_tag = file->read(gd3_size);
+			gzread(file, (char*)&gd3_size, 4);
+
+			data = new char[gd3_size];
+			gzread(file, data, gd3_size);
+			gd3_tag.setRawData(data, gd3_size);
 
 			int i = gd3_size;
 			while(i >= 0)
@@ -445,6 +448,8 @@ void VGMPlayer::ReadGD3Tag(QFile *file, int gd3_tag_offset)
 			gd3_releasedate = gd3_tag_string_list[8];
 			gd3_convertername = gd3_tag_string_list[9];
 			gd3_notes = gd3_tag_string_list[10];
+
+			delete[] data;
 		}
 		else
 			qDebug() << "Unknow gd3 tag version number.";
