@@ -5,15 +5,14 @@
 //                                              //
 // #file: vgmplayer.cpp                         //
 //                                              //
-// last changes at 10-23-2022                   //
+// last changes at 11-17-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "vgmplayer.h"
-#include "./gunzip.h"
 
-#include <iostream>
+#include <zlib.h>
 
 //#define GB_DMG_TEST
 
@@ -45,203 +44,138 @@ VGMPlayer::~VGMPlayer()
 
 bool VGMPlayer::Open(QString filename)
 {
-    int64_t nbytes;
+	int64_t nbytes;
 
-    // for gzip
-    unsigned char *window;
-    z_stream strm;
-    QString temp_filename;
+	is_playing = false;
+	samples_waiting = false;
 
-    is_playing = false;
-    samples_waiting = false;
-
-    file.setFileName(filename);
-
-    if(!file.open(QIODevice::ReadOnly))
-    {
-        is_file_open = false;
-        return false;
-    }
-
-    // File check for gzip compression
-    uint16_t gzip_id;
-    int ret;
-
-    bool is_compressed = false;
-
-    nbytes = file.read(reinterpret_cast<char*>(&gzip_id), 2);
-    if(nbytes == 2)
-    {
-        if(gzip_id == 0x8b1f)
-        {
-            file.close();
-
-            is_compressed = true;
-
-            /* initialize inflateBack state for repeated use */
-            window = match;                         /* reuse LZW match buffer */
-            strm.zalloc = Z_NULL;
-            strm.zfree = Z_NULL;
-            strm.opaque = Z_NULL;
-            ret = inflateBackInit(&strm, 15, window);
-
-            if (ret != Z_OK)
-            {
-                fprintf(stderr, "gunzip out of memory error--aborting\n");
-                return false;
-            }
-
-            temp_filename = QDir::tempPath() + "/vgmplayer.tmp";
-
-			std::cout << "Marker 001" << std::endl;
-			std::cout << "Zlib Version: " << ZLIB_VERSION << std::endl;
-            ret = gunzip(&strm, filename.toUtf8().data(), temp_filename.toUtf8().data(), 0);
-			std::cout << "Marker 002" << std::endl;
-
-            inflateBackEnd(&strm);
-        }
-        else file.seek(0);
-    }
-    else
-    {
-        // this File is too small
-        return false;
-    }
-
-    if(is_compressed)
-    {
-        // temporary file open
-        file.setFileName(temp_filename);
-        if(!file.open(QIODevice::ReadOnly))
-        {
-            is_file_open = false;
-            return false;
-        }
-    }
-
-    nbytes = file.read(reinterpret_cast<char*>(&file_ident), 4);
-
-    // 0x56 0x67 0x6d 0x20
-    // "Vgm "
-    if((file_ident != 0x206d6756) && (nbytes == 4))
-    {
-        is_file_open = false;
-        file.close();
-        return false;
-    }
-
-    // End Of File Offset
-    nbytes = file.read(reinterpret_cast<char*>(&eof_offset), 4);
-    eof_offset += 0x04; // offset from file begin
-
-    // Version Number
-    nbytes = file.read(reinterpret_cast<char*>(&version_number), 4);
-
-    // SN76948 Clock
-    nbytes = file.read(reinterpret_cast<char*>(&sn76489_clock), 4);
-
-    // YM2413 Clock
-    nbytes = file.read(reinterpret_cast<char*>(&ym2413_clock), 4);
-
-    // GD3 Tag Offset
-    nbytes = file.read(reinterpret_cast<char*>(&gd3_tag_offset), 4);
-    gd3_tag_offset += 0x14; // offset from file begin
-
-    // Total Samples
-    nbytes = file.read(reinterpret_cast<char*>(&total_samples), 4);
-
-    // Loop Offset
-    nbytes = file.read(reinterpret_cast<char*>(&loop_offset), 4);
-
-    // Loop Samples
-    nbytes = file.read(reinterpret_cast<char*>(&loop_samples), 4);
-
-    // Loop Rate
-    nbytes = file.read(reinterpret_cast<char*>(&rate), 4);
-
-    // SN76489 Feedback
-    nbytes = file.read(reinterpret_cast<char*>(&sn76489_feedback), 2);
-
-    // SN76489 Shift Register Width
-    nbytes = file.read(reinterpret_cast<char*>(&sn76489_shift_reg_width), 1);
-
-    // SN76489 Flags
-    nbytes = file.read(reinterpret_cast<char*>(&sn76489_flags), 1);
-
-    // YM2612 Clock
-    nbytes = file.read(reinterpret_cast<char*>(&ym2612_clock), 4);
-
-    // YM2151 Clock
-    nbytes = file.read(reinterpret_cast<char*>(&ym2151_clock), 4);
-
-    // VGM Data Offset
-    nbytes = file.read(reinterpret_cast<char*>(&vgm_data_offset), 4);
-
-    if(vgm_data_offset == 0)
-        vgm_data_offset = 0x40;     // offset from file begin
-    else
-        vgm_data_offset += 0x34;    // offset from file begin
-
-    if(version_number == 0x00000161 || version_number == 0x00000170)
-    {
-        // GameBoy DMG Clock
-        file.seek(0x80);
-        nbytes = file.read(reinterpret_cast<char*>(&gb_dmg_clock), 4);
-    }
-
-    file.seek(vgm_data_offset);
-
-    if(streaming_data == nullptr)
-    {
-        delete [] streaming_data;
-        streaming_data = nullptr;
-    }
-
-    if(gd3_tag_offset == 0)
-    {
-       streaming_data_length = eof_offset - vgm_data_offset;
-    }
-    else
-    {
-        streaming_data_length = gd3_tag_offset - vgm_data_offset;
-    }
-
-    streaming_data = new uint8_t [streaming_data_length];
-
-    // VGM Data Offset
-    nbytes = file.read(reinterpret_cast<char*>(streaming_data), streaming_data_length);
-
-    if(nbytes != streaming_data_length)
-        qDebug() << "Error: failed streaming length.";
-
-	ReadGD3Tag(&file, gd3_tag_offset);
-
-    file.close();
-
-	if(gd3_tag_offset != 0)
+	gzFile file = gzopen(filename.toStdString().data(), "rb");
+	if (! file)
 	{
-		ReadGD3Tag(&file, gd3_tag_offset);
+		fprintf (stderr, "gzopen of '%s' failed: %s.\n", filename.toStdString().data(), strerror (errno));
+		return false;
 	}
 
-    if(is_compressed)
-    {
-        // temporary file delete
-        file.remove();
-    }
+		nbytes = gzread(file, reinterpret_cast<char*>(&file_ident), 4);
 
-    AnalyzingStreamForSoundchips();
+		// 0x56 0x67 0x6d 0x20
+		// "Vgm "
+		if((file_ident != 0x206d6756) && (nbytes == 4))
+		{
+			is_file_open = false;
+			fprintf(stderr, "NOT A VGM/VGZ File!\n");
+			gzclose(file);
+			return false;
+		}
 
-    streaming_pos = 0;
+		// End Of File Offset
+		nbytes = gzread(file, reinterpret_cast<char*>(&eof_offset), 4);
+		eof_offset += 0x04; // offset from file begin
 
-    if(is_SN76489_enabled)
-        InitSN76489();
-    if(is_YM2612_enable)
-        InitYM2612();
-    if(is_GB_DMG_enable)
-        InitGBDMG();
+		// Version Number
+		nbytes = gzread(file, reinterpret_cast<char*>(&version_number), 4);
 
-    is_file_open = true;
-    return true;
+		// SN76948 Clock
+		nbytes = gzread(file, reinterpret_cast<char*>(&sn76489_clock), 4);
+
+		// YM2413 Clock
+		nbytes = gzread(file, reinterpret_cast<char*>(&ym2413_clock), 4);
+
+		// GD3 Tag Offset
+		nbytes = gzread(file, reinterpret_cast<char*>(&gd3_tag_offset), 4);
+		gd3_tag_offset += 0x14; // offset from file begin
+
+		// Total Samples
+		nbytes = gzread(file, reinterpret_cast<char*>(&total_samples), 4);
+
+		// Loop Offset
+		nbytes = gzread(file, reinterpret_cast<char*>(&loop_offset), 4);
+
+		// Loop Samples
+		nbytes = gzread(file, reinterpret_cast<char*>(&loop_samples), 4);
+
+		// Loop Rate
+		nbytes = gzread(file, reinterpret_cast<char*>(&rate), 4);
+
+		// SN76489 Feedback
+		nbytes = gzread(file, reinterpret_cast<char*>(&sn76489_feedback), 2);
+
+		// SN76489 Shift Register Width
+		nbytes = gzread(file, reinterpret_cast<char*>(&sn76489_shift_reg_width), 1);
+
+		// SN76489 Flags
+		nbytes = gzread(file, reinterpret_cast<char*>(&sn76489_flags), 1);
+
+		// YM2612 Clock
+		nbytes = gzread(file, reinterpret_cast<char*>(&ym2612_clock), 4);
+
+		// YM2151 Clock
+		nbytes = gzread(file, reinterpret_cast<char*>(&ym2151_clock), 4);
+
+		// VGM Data Offset
+		nbytes = gzread(file, reinterpret_cast<char*>(&vgm_data_offset), 4);
+
+		if(vgm_data_offset == 0)
+			vgm_data_offset = 0x40;     // offset from file begin
+		else
+			vgm_data_offset += 0x34;    // offset from file begin
+
+		if(version_number == 0x00000161 || version_number == 0x00000170)
+		{
+			// GameBoy DMG Clock
+			gzseek(file, 0x80, SEEK_SET);
+			nbytes = gzread(file, reinterpret_cast<char*>(&gb_dmg_clock), 4);
+		}
+
+		gzseek(file, vgm_data_offset, SEEK_SET);
+
+		if(streaming_data == nullptr)
+		{
+			delete [] streaming_data;
+			streaming_data = nullptr;
+		}
+
+		if(gd3_tag_offset == 0)
+		{
+		   streaming_data_length = eof_offset - vgm_data_offset;
+		}
+		else
+		{
+			streaming_data_length = gd3_tag_offset - vgm_data_offset;
+		}
+
+		streaming_data = new uint8_t [streaming_data_length];
+
+		// VGM Data Offset
+		nbytes = gzread(file, reinterpret_cast<char*>(streaming_data), streaming_data_length);
+
+		if(nbytes != streaming_data_length)
+			qDebug() << "Error: failed streaming length.";
+
+		//ReadGD3Tag(&file, gd3_tag_offset);
+
+		gzclose(file);
+
+		if(gd3_tag_offset != 0)
+		{
+			//ReadGD3Tag(&file, gd3_tag_offset);
+		}
+
+		AnalyzingStreamForSoundchips();
+
+		streaming_pos = 0;
+
+		if(is_SN76489_enabled)
+			InitSN76489();
+		if(is_YM2612_enable)
+			InitYM2612();
+		if(is_GB_DMG_enable)
+			InitGBDMG();
+
+		is_file_open = true;
+
+
+	return true;
 }
 
 bool VGMPlayer::isOpen()
@@ -471,6 +405,7 @@ void VGMPlayer::WriteGBDMGRegister(uint8_t reg_nr, uint8_t value)
 
 void VGMPlayer::ReadGD3Tag(QFile *file, int gd3_tag_offset)
 {
+
 	file->seek(gd3_tag_offset);
 
 	char gd3_identifier[5] = "    ";

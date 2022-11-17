@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.h                           //
 //                                              //
-// last changes at 10-17-2022                   //
+// last changes at 11-17-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -72,7 +72,7 @@ private:
     void InitYM2612();
     void InitGBDMG();
 
-    QFile   file;
+	QFile   file;
     bool    is_file_open;
 
     uint32_t samplerate;
