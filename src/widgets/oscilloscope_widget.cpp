@@ -149,7 +149,7 @@ void OscilloscopeWidget::DrawInfos(QPainter &painter, int width, int height)
     QString OutString = "Periodic time: " + QString::number((1.0f/samplerate) * sample_counter_period)+ " sek";
     painter.drawText(10,20,OutString);
 
-    OutString = "Frequncy: " + QString::number(samplerate / sample_counter_period) + " Hz";
+	OutString = "Frequency: " + QString::number(samplerate / sample_counter_period) + " Hz";
     painter.drawText(10,35,OutString);
 
     OutString = QString::number(1.0f / amplifire) + " Volt/Div";

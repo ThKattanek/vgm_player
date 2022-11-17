@@ -39,7 +39,7 @@
        <item>
         <widget class="QTableWidget" name="gd3_tag_table">
          <attribute name="verticalHeaderMinimumSectionSize">
-          <number>18</number>
+          <number>22</number>
          </attribute>
          <attribute name="verticalHeaderDefaultSectionSize">
           <number>18</number>
