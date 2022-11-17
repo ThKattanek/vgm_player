@@ -36,7 +36,6 @@ SOURCES += \
 
 HEADERS += \
     gb_dmg_class.h \
-    gunzip.h \
     mainwindow.h \
     sn76489_class.h \
     vgmplayer.h \

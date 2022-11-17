@@ -38,11 +38,16 @@
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <widget class="QTableWidget" name="gd3_tag_table">
+         <property name="font">
+          <font>
+           <pointsize>8</pointsize>
+          </font>
+         </property>
          <attribute name="verticalHeaderMinimumSectionSize">
-          <number>18</number>
+          <number>22</number>
          </attribute>
          <attribute name="verticalHeaderDefaultSectionSize">
-          <number>18</number>
+          <number>22</number>
          </attribute>
          <row>
           <property name="text">

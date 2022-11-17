@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.h                           //
 //                                              //
-// last changes at 10-17-2022                   //
+// last changes at 11-17-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -14,6 +14,7 @@
 #define VGMPLAYER_H
 
 #include <QtCore>
+#include <zlib.h>
 #include "./sn76489_class.h"
 #include "./ym2612_class.h"
 #include "./gb_dmg_class.h"
@@ -65,14 +66,14 @@ public:
 	QString gd3_notes;
 
 private:
-	void ReadGD3Tag(QFile *file, int gd3_tag_offset);
+	void ReadGD3Tag(gzFile file, int gd3_tag_offset);
     void ExecuteNextStreamCommand();
     void AnalyzingStreamForSoundchips();
     void InitSN76489();
     void InitYM2612();
     void InitGBDMG();
 
-    QFile   file;
+	QFile   file;
     bool    is_file_open;
 
     uint32_t samplerate;
