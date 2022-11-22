@@ -210,6 +210,11 @@ float SN76489Class::GetSampleRight()
 #endif
 }
 
+int SN76489Class::GetVoiceCount()
+{
+	return VOICE_COUNT_SN76489;
+}
+
 float SN76489Class::GetSampleVoice(int voice)
 {
 		switch (voice) {
