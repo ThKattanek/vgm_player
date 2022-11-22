@@ -5,7 +5,7 @@
 //                                              //
 // #file: sn76489_class.cpp                     //
 //                                              //
-// last changes at 10-15-2022                   //
+// last changes at 11-22-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -207,7 +207,28 @@ float SN76489Class::GetSampleRight()
 				((channels & 0x04) ? tone2_output * tone2_attenuation : tone2_output * tone2_attenuation * stereo_strength) + \
 				((channels & 0x02) ? tone3_output * tone3_attenuation : tone3_output * tone3_attenuation * stereo_strength) + \
 				((channels & 0x01) ? noise_output * noise_attenuation : noise_output * noise_attenuation * stereo_strength);
-	#endif
+#endif
+}
+
+float SN76489Class::GetSampleVoice(int voice)
+{
+		switch (voice) {
+		case 0:
+			return tone1_output * tone1_attenuation;
+			break;
+		case 1:
+			return tone2_output * tone2_attenuation;
+			break;
+		case 2:
+			return tone3_output * tone3_attenuation;
+			break;
+		case 3:
+			return noise_output * noise_attenuation;
+			break;
+		default:
+			return 0.0f;
+			break;
+		}
 }
 
 void SN76489Class::CalcSubCounter()
