@@ -33,19 +33,25 @@ public:
     void SetTriggerTyp(int value);
     void SetTriggerLevel(float value);
 
+	void EnableDrawBackground(bool enabled);
+	void EnableDrawRaster(bool enabled);
+	void EnableDrawTriggerLevel(bool enabled);
+	void EnableDrawData(bool enabled);
+	void EnableDrawInfos(bool enabled);
+
     void paintEvent(QPaintEvent *);
-    void DrawRaster(QPainter &painter, int width, int height);
-    void DrawTriggerLevel(QPainter &painter, int width, int height);
-    void DrawData(QPainter &painter, int width);
-    void DrawInfos(QPainter &painter, int width, int height);
     void NextAudioData(float *data, int length);
 
 public slots:
 
     void OnRefresh();
 
-
 private:
+	void DrawRaster(QPainter &painter, int width, int height);
+	void DrawTriggerLevel(QPainter &painter, int width, int height);
+	void DrawData(QPainter &painter, int width);
+	void DrawInfos(QPainter &painter, int width, int height);
+
     Ui::OscilloscopeWidget *ui;
     QColor CalcFadeColor(QColor src_color, QColor dst_color, float fade);   // fade 0.0 = 100% scr_color | 1.0 = 100% dst_color
 
@@ -81,6 +87,11 @@ private:
     uint32_t trigger_sample_counter;    // Zum ermitteln der Frequenz
     uint32_t sample_counter_period;     // Anzahl der Sample pro Periode (zwischen 2 Trigger!!)
 
+	bool draw_background;
+	bool draw_raster;
+	bool draw_trigger_level;
+	bool draw_data;
+	bool draw_infos;
 
     QTimer *timer1;
     bool refresh;
