@@ -798,16 +798,19 @@ void VGMPlayer::AnalyzingStreamForSoundchips()
 void VGMPlayer::InitSN76489()
 {
     sn76489.SetClockSpeed(sn76489_clock);
+	sn76489.SetSampleRate(samplerate);
 	sn76489.SetStereoControl(0xff);
 }
 
 void VGMPlayer::InitYM2612()
 {
     ym2612.SetClockSpeed(ym2612_clock);
+	ym2612.SetSampleRate(samplerate);
 }
 
 void VGMPlayer::InitGBDMG()
 {
     gbdmg.SetClockSpeed(gb_dmg_clock);
+	gbdmg.SetSampleRate(samplerate);
 	gbdmg.Reset();
 }
