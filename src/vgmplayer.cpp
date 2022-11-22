@@ -823,6 +823,9 @@ void VGMPlayer::AnalyzingStreamForSoundchips()
         is_GB_DMG_enable = true;
         current_soundchip_count++;
     }
+
+	if(current_soundchip_count > 1)
+		qDebug() << "This VGM File has more as one sound chips!";
 }
 
 void VGMPlayer::InitSN76489()
