@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.cpp                         //
 //                                              //
-// last changes at 11-17-2022                   //
+// last changes at 11-22-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -253,7 +253,37 @@ void VGMPlayer::GetNextSample(float *sample_left, float *sample_right)
         *sample_left = sample;
         *sample_left = sample;
 #endif
-    }
+	}
+}
+
+int VGMPlayer::GetVoiceCount()
+{
+	if(current_soundchip_count > 1)
+		return 0;
+
+	if(is_SN76489_enabled)
+		return sn76489.GetVoiceCount();
+
+	if(is_GB_DMG_enable)
+		return gbdmg.GetVoiceCount();
+}
+
+float VGMPlayer::GetSampleVoice(int voice)
+{
+	if(is_playing)
+	{
+		if(current_soundchip_count > 1)
+			return 0.0f;
+		else
+		{
+			if(is_SN76489_enabled)
+				return sn76489.GetSampleVoice(voice);
+			if(is_GB_DMG_enable)
+				return gbdmg.GetSampleVoice(voice);
+		}
+	}
+	else
+		return 0.0f;
 }
 
 void VGMPlayer::SetPlay(bool playing)
