@@ -258,14 +258,15 @@ void VGMPlayer::GetNextSample(float *sample_left, float *sample_right)
 
 int VGMPlayer::GetVoiceCount()
 {
-	if(current_soundchip_count > 1)
-		return 0;
+	if(current_soundchip_count == 1)
+	{
+		if(is_SN76489_enabled)
+			return sn76489.GetVoiceCount();
 
-	if(is_SN76489_enabled)
-		return sn76489.GetVoiceCount();
-
-	if(is_GB_DMG_enable)
-		return gbdmg.GetVoiceCount();
+		if(is_GB_DMG_enable)
+			return gbdmg.GetVoiceCount();
+	}
+	return 0;
 }
 
 float VGMPlayer::GetSampleVoice(int voice)
@@ -282,8 +283,8 @@ float VGMPlayer::GetSampleVoice(int voice)
 				return gbdmg.GetSampleVoice(voice);
 		}
 	}
-	else
-		return 0.0f;
+
+	return 0.0f;
 }
 
 void VGMPlayer::SetPlay(bool playing)
