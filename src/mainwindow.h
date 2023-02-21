@@ -24,10 +24,9 @@
 #include <QAudioDeviceInfo>
 #include <QAudioOutput>
 
-#include "./widgets/oscilloscope_widget.h"
-
 #define SAMPLERATE 44100
 #define SOUND_BUFFER_SIZE 8192
+#define MAX_OSCILLOSCOPES 32
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -67,7 +66,8 @@ private:
     QAudioFormat     m_format;
     QByteArray       m_buffer;
     QAudioOutput    *m_audioOutput;
-
     AudioGenerator *m_audiogen;
+
+	float* oscilloscope_buffers[MAX_OSCILLOSCOPES];
 };
 #endif // MAINWINDOW_H

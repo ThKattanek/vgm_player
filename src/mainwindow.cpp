@@ -13,6 +13,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "./widgets/oscilloscope_widget.h"
+
 #include <QStyle>
 #include <QDesktopWidget>
 
@@ -136,23 +138,28 @@ void MainWindow::InitOscilloscopes(int count)
 {
 	for(int i=0; i<count; i++)
 	{
-		OscilloscopeWidget* w = new OscilloscopeWidget();
+		if(i < MAX_OSCILLOSCOPES)
+		{
+			OscilloscopeWidget* w = new OscilloscopeWidget();
 
-		w->setFixedSize(80, 64);
-		w->SetSamplerate(SAMPLERATE);
-		w->SetVerticalPosition(0.5f);
-		w->SetTriggerTyp(TRIGGER_TYP::RISING_EDGE);
-		w->SetTriggerLevel(0);
-		w->SetVoltPerDivision(0.2f);
+			w->setFixedSize(80, 64);
+			w->SetSamplerate(SAMPLERATE);
+			w->SetVerticalPosition(0.5f);
+			w->SetTriggerTyp(TRIGGER_TYP::RISING_EDGE);
+			w->SetTriggerLevel(0);
+			w->SetVoltPerDivision(0.1f);
 
-		w->EnableDrawBackground(true);
-		w->EnableDrawData(true);
-		w->EnableDrawTriggerLevel(true);
+			w->EnableDrawBackground(true);
+			w->EnableDrawData(true);
+			w->EnableDrawTriggerLevel(true);
 
-		w->SetLineColor(QColor(255,255,255,128));
-		w->SetBackgroundColor(QColor(0,0,150,255));
+			w->SetLineColor(QColor(255,255,255,128));
+			w->SetBackgroundColor(QColor(0,0,150,255));
 
-		ui->voices_hlayout->addWidget(w);
+			ui->voices_hlayout->addWidget(w);
+
+			oscilloscope_buffers[i] = new float[bufferSize];
+		}
 	}
 }
 
@@ -162,17 +169,24 @@ void MainWindow::ReleaseOscilloscopes()
 
 	for(int i=0; i < count; i++)
 	{
-		// get the item in the layout at index 0
-		QLayoutItem* item = ui->voices_hlayout->itemAt(0);
-		ui->voices_hlayout->removeItem(item);
-
-		// get the widget
-		QWidget* widget = item->widget();
-
-		// check if a valid widget
-		if(widget)
+		if(i < MAX_OSCILLOSCOPES)
 		{
-			delete widget;
+			// get the item in the layout at index 0
+			QLayoutItem* item = ui->voices_hlayout->itemAt(0);
+			ui->voices_hlayout->removeItem(item);
+
+			// get the widget
+			QWidget* widget = item->widget();
+
+			// check if a valid widget
+			if(widget)
+			{
+				delete widget;
+			}
+
+			// oscilloscope buffer delete
+			if(oscilloscope_buffers[i])
+				delete[] oscilloscope_buffers[i];
 		}
 	}
 }
@@ -188,13 +202,18 @@ void MainWindow::OnFillAudioData(char *data, qint64 len)
         vgm_player.GetNextSample(&sample_left, &sample_right);
         buffer[i] = sample_left;
         buffer[i+1] = sample_right;
+
+		for(int j=0; j<vgm_player.GetVoiceCount(); j++)
+		{
+			if(j < MAX_OSCILLOSCOPES)
+				oscilloscope_buffers[j][i/2] = vgm_player.GetSampleVoice(j);
+		}
     }
 
-	//ui->oscilloscope->NextAudioData(reinterpret_cast<float*>(data), len / (m_format.sampleSize()/8));
 	for(int i=0; i<ui->voices_hlayout->count(); i++)
 	{
 		OscilloscopeWidget* w = (OscilloscopeWidget*)ui->voices_hlayout->itemAt(i)->widget();
-		w->NextAudioData(reinterpret_cast<float*>(data), len / (m_format.sampleSize()/8));
+		w->NextAudioData(reinterpret_cast<float*>(oscilloscope_buffers[i]), len / (m_format.sampleSize()/8)/2);
 	}
 }
 
