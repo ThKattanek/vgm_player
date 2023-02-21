@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.cpp                         //
 //                                              //
-// last changes at 11-22-2022                   //
+// last changes at 02-21-2023                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -430,6 +430,32 @@ uint32_t VGMPlayer::GetStreamingPos()
 void VGMPlayer::WriteGBDMGRegister(uint8_t reg_nr, uint8_t value)
 {
 	gbdmg.WriteReg(reg_nr, value);
+}
+
+void VGMPlayer::SetChannelMute(int voice, bool enable)
+{
+	if(current_soundchip_count > 1)
+		return;
+	else
+	{
+		if(is_SN76489_enabled)
+			sn76489.MuteChannel(voice, enable);
+		if(is_GB_DMG_enable)
+			gbdmg.MuteChannel(voice, enable);
+	}
+}
+
+void VGMPlayer::SetChannelSolo(int voice)
+{
+	if(current_soundchip_count > 1)
+		return;
+	else
+	{
+		if(is_SN76489_enabled)
+			sn76489.SoloChannel(voice);
+		if(is_GB_DMG_enable)
+			gbdmg.SoloChannel(voice);
+	}
 }
 
 void VGMPlayer::ReadGD3Tag(gzFile file, int gd3_tag_offset)
