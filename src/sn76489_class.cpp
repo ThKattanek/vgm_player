@@ -157,9 +157,6 @@ void SN76489Class::CalcNextSample()
         if(noise_counter >= 1.0f)
             StepNoiseGerator();
     }
-
-	tone1_output = 0.0f;
-	noise_output = 0.0f;
 /*
 #ifndef EMU_ATTENUATION
     return  tone1_output + tone2_output + tone3_output + noise_output;
