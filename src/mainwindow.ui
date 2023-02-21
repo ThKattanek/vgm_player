@@ -22,7 +22,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="OscilloscopeWidget" name="oscilloscope" native="true"/>
+     <layout class="QHBoxLayout" name="voices_hlayout"/>
     </item>
     <item>
      <widget class="QGroupBox" name="groupBox_2">
@@ -254,14 +254,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>OscilloscopeWidget</class>
-   <extends>QWidget</extends>
-   <header>widgets/oscilloscope_widget.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

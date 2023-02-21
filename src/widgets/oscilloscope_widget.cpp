@@ -38,10 +38,12 @@ OscilloscopeWidget::OscilloscopeWidget(QWidget *parent) :
     connect(timer1,SIGNAL(timeout()),this,SLOT(OnRefresh()));
     timer1->start(10);
 
-    output_line_pen = new QPen(Qt::green, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+	output_line_pen = new QPen(Qt::green, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
 
     trigger_sample_counter = 0;
     sample_counter_period = 0;
+
+	draw_background = draw_raster = draw_trigger_level = draw_data = draw_infos = false;
 }
 
 OscilloscopeWidget::~OscilloscopeWidget()
@@ -54,12 +56,11 @@ void OscilloscopeWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
 
-    painter.fillRect(0,0,this->width(),this->height(), background_color);
-
-    DrawRaster(painter, this->width(), this->height());
-    DrawData(painter, this->width());
-    DrawTriggerLevel(painter, this->width(), this->height());
-    DrawInfos(painter, this->width(), this->height());
+	if(draw_background) painter.fillRect(0,0,this->width(),this->height(), background_color);
+	if(draw_raster) DrawRaster(painter, this->width(), this->height());
+	if(draw_data) DrawData(painter, this->width());
+	if(draw_trigger_level) DrawTriggerLevel(painter, this->width(), this->height());
+	if(draw_infos) DrawInfos(painter, this->width(), this->height());
 }
 
 void OscilloscopeWidget::DrawRaster(QPainter &painter, int width, int height)
@@ -131,7 +132,7 @@ void OscilloscopeWidget::DrawData(QPainter &painter, int width)
     x1 = 0;
     y1 = tmp_output[0];
 
-    for(x2=1; x2<width; x2++)
+	for(x2=1; x2<width; x2++)
     {
          y2 = tmp_output[x2];
          painter.drawLine(x1,y1,x2,y2);
@@ -262,6 +263,7 @@ void OscilloscopeWidget::SetBackgroundColor(QColor color)
 void OscilloscopeWidget::SetLineColor(QColor color)
 {
     line_color = color;
+	output_line_pen->setColor(line_color);
 }
 
 void OscilloscopeWidget::SetTriggerLineColor(QColor color)
@@ -296,5 +298,30 @@ void OscilloscopeWidget::SetTriggerTyp(int value)
 
 void OscilloscopeWidget::SetTriggerLevel(float value)
 {
-    trigger_level = value;
+	trigger_level = value;
+}
+
+void OscilloscopeWidget::EnableDrawBackground(bool enabled)
+{
+	draw_background = enabled;
+}
+
+void OscilloscopeWidget::EnableDrawRaster(bool enabled)
+{
+	draw_raster = enabled;
+}
+
+void OscilloscopeWidget::EnableDrawTriggerLevel(bool enabled)
+{
+	draw_trigger_level = enabled;
+}
+
+void OscilloscopeWidget::EnableDrawData(bool enabled)
+{
+	draw_data = enabled;
+}
+
+void OscilloscopeWidget::EnableDrawInfos(bool enabled)
+{
+	draw_infos = enabled;
 }

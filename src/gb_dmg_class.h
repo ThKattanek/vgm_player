@@ -5,7 +5,7 @@
 //                                              //
 // #file: gb_dmg_class.h                        //
 //                                              //
-// last changes at 10-23-2022                   //
+// last changes at 11-22-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -14,6 +14,8 @@
 #define GB_DMGCLASS_H
 
 #include <cstdint>
+
+#define VOICE_COUNT_GB_DMG 4
 
 class GB_DMGClass
 {
@@ -28,8 +30,8 @@ public:
 	void CalcNextSample();
 	float GetSampleLeft();
 	float GetSampleRight();
-
-	//float GetNextSample();
+	int GetVoiceCount();
+	float GetSampleVoice(int voice);
 
 private:
     void CalcSubCounter();
@@ -136,6 +138,8 @@ private:
 	float channel4_out;
 
 	///////////////////////////////////////////////////////
+
+	float ch1, ch2, ch3, ch4;
 
 	float sample_left_out;
 	float sample_right_out;

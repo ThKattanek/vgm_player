@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.h                           //
 //                                              //
-// last changes at 11-17-2022                   //
+// last changes at 11-22-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -28,6 +28,8 @@ public:
     bool isOpen();
     void SetSampleRate(uint32_t samplerate);
     void GetNextSample(float *sample_left, float *sample_right);
+	int GetVoiceCount();
+	float GetSampleVoice(int voice);
     void SetPlay(bool playing);
 	void Set_SN76489_StereoStrength(float stereo_strength);
     bool ExportStreamingData(QString filename);

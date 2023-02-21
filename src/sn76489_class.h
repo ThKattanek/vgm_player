@@ -5,7 +5,7 @@
 //                                              //
 // #file: sn76489_class.h                       //
 //                                              //
-// last changes at 10-15-2022                   //
+// last changes at 11-22-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -14,6 +14,8 @@
 #define SN76489CLASS_H
 
 #include <cstdint>
+
+#define VOICE_COUNT_SN76489 4
 
 static const float volume_table[16]={1.0f, 0.7943f, 0.631f, 0.5012f, 0.3981f, 0.3162f, 0.2512f, 0.2004f, 0.1585f, 0.1259f, 0.1f, 0.0794f, 0.0634f, 0.0501f, 0.0398f, 0.f};
 
@@ -31,6 +33,8 @@ public:
 	void SetStereoStrength(float stereo_strength);
 	float GetSampleLeft();
 	float GetSampleRight();
+	int GetVoiceCount();
+	float GetSampleVoice(int voice);
 
 private:
     void CalcSubCounter();

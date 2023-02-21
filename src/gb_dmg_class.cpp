@@ -5,7 +5,7 @@
 //                                              //
 // #file: gb_dmg_class.cpp                      //
 //                                              //
-// last changes at 10-23-2022                   //
+// last changes at 11-22-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -494,10 +494,10 @@ void GB_DMGClass::CalcNextSample()
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	float ch1 = channel1_out * volume_out_table[channel1_current_volume & 0x0f];
-	float ch2 = channel2_out * volume_out_table[channel2_current_volume & 0x0f];
-	float ch3 = channel3_out * channel3_volume;
-	float ch4 = channel4_out * volume_out_table[channel4_current_volume & 0x0f];
+	ch1 = channel1_out * volume_out_table[channel1_current_volume & 0x0f];
+	ch2 = channel2_out * volume_out_table[channel2_current_volume & 0x0f];
+	ch3 = channel3_out * channel3_volume;
+	ch4 = channel4_out * volume_out_table[channel4_current_volume & 0x0f];
 
 	float left_out, right_out;
 	left_out = right_out = 0.0f;
@@ -544,6 +544,32 @@ float GB_DMGClass::GetSampleLeft()
 float GB_DMGClass::GetSampleRight()
 {
 	return sample_right_out;
+}
+
+int GB_DMGClass::GetVoiceCount()
+{
+	return VOICE_COUNT_GB_DMG;
+}
+
+float GB_DMGClass::GetSampleVoice(int voice)
+{
+	switch (voice) {
+	case 0:
+		return ch1;
+		break;
+	case 1:
+		return ch2;
+		break;
+	case 2:
+		return ch3;
+		break;
+	case 3:
+		return ch4;
+		break;
+	default:
+		return 0.0f;
+		break;
+	}
 }
 
 void GB_DMGClass::Reset()

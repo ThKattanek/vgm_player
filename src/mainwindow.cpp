@@ -5,7 +5,7 @@
 //                                              //
 // #file: mainwindow.cpp                        //
 //                                              //
-// last changes at 10-17-2022                   //
+// last changes at 11-22-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -13,10 +13,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "./widgets/oscilloscope_widget.h"
+
 #include <QStyle>
 #include <QDesktopWidget>
-
-#define SAMPLERATE 44100
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -35,12 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     LogText("VGM Player - by Thorsten Kattanek\n");
 
-    ui->oscilloscope->setFixedSize(10*40, 8*40);
-    ui->oscilloscope->SetSamplerate(SAMPLERATE);
-    ui->oscilloscope->SetVerticalPosition(0.5f);
-    ui->oscilloscope->SetTriggerTyp(TRIGGER_TYP::RISING_EDGE);
-    ui->oscilloscope->SetTriggerLevel(0);
-    ui->oscilloscope->SetVoltPerDivision(0.25f);
+	ui->voices_hlayout->setSpacing(2);
 
 	ui->sn76489_stereo_slider->setValue(75);
 
@@ -66,7 +61,7 @@ void MainWindow::InitAudio()
 {
     bufferSize = SOUND_BUFFER_SIZE * 2;
 
-    m_format.setSampleRate(44100);
+	m_format.setSampleRate(SAMPLERATE);
     m_format.setChannelCount(2);
     m_format.setSampleSize(32);
     m_format.setCodec("audio/pcm");
@@ -78,23 +73,23 @@ void MainWindow::InitAudio()
     QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
     if (!info.isFormatSupported(m_format))
     {
-        qWarning() << "Default format not supported (44100/Stereo/Float)";
+		qWarning() << "Default format not supported (" << SAMPLERATE << "/Stereo/Float)";
 
-        // Second Audioformat (44100/Stereo/Signed Int 16Bit)
+		// Second Audioformat (44100/Stereo/Signed Int 16Bit)
         m_format.setSampleSize(16);
         m_format.setSampleType(QAudioFormat::SampleType::SignedInt);
         if (!info.isFormatSupported(m_format))
         {
-            qWarning() << "Second format not supported (44100/Stereo/Signed Int 16Bit)";
+			qWarning() << "Second format not supported (" << SAMPLERATE << "/Stereo/Signed Int 16Bit)";
         }
         else
         {
-             qInfo() << "Current Audioformat: 44100/Stereo/Signed Int 16Bit";
+			 qInfo() << "Current Audioformat: " << m_format.sampleRate() << "/Stereo/Signed Int 16Bit";
              is_supported_format = true;
         }
     }
     else{
-        qInfo() << "Current Audioformat: 44100/Stereo/Float";
+		qInfo() << "Current Audioformat: " << m_format.sampleRate() << "/Stereo/Float";
         is_supported_format = true;
     }
 
@@ -107,12 +102,14 @@ void MainWindow::InitAudio()
         m_audioOutput->setBufferSize(bufferSize);
         m_audiogen = new AudioGenerator(m_format, this);
 
+		vgm_player.SetSampleRate(m_format.sampleRate());
+
         connect(m_audiogen, SIGNAL(FillAudioData(char*, qint64)), this, SLOT(OnFillAudioData(char*, qint64)));
 
         m_audiogen->start();
-        m_audioOutput->start(m_audiogen);
-
-        m_audioOutput->setVolume(1);
+		m_audioOutput->setVolume(1);
+		m_audioOutput->start(m_audiogen);
+		m_audioOutput->suspend();
     }
 }
 
@@ -137,6 +134,63 @@ void MainWindow::FillGD3TagTable()
 	}
 }
 
+void MainWindow::InitOscilloscopes(int count)
+{
+	for(int i=0; i<count; i++)
+	{
+		if(i < MAX_OSCILLOSCOPES)
+		{
+			OscilloscopeWidget* w = new OscilloscopeWidget();
+
+			w->setFixedSize(80, 64);
+			w->SetSamplerate(SAMPLERATE);
+			w->SetVerticalPosition(0.5f);
+			w->SetTriggerTyp(TRIGGER_TYP::RISING_EDGE);
+			w->SetTriggerLevel(0);
+			w->SetVoltPerDivision(0.1f);
+
+			w->EnableDrawBackground(true);
+			w->EnableDrawData(true);
+			w->EnableDrawTriggerLevel(true);
+
+			w->SetLineColor(QColor(255,255,255,128));
+			w->SetBackgroundColor(QColor(0,0,150,255));
+
+			ui->voices_hlayout->addWidget(w);
+
+			oscilloscope_buffers[i] = new float[bufferSize];
+		}
+	}
+}
+
+void MainWindow::ReleaseOscilloscopes()
+{
+	int count = ui->voices_hlayout->count();
+
+	for(int i=0; i < count; i++)
+	{
+		if(i < MAX_OSCILLOSCOPES)
+		{
+			// get the item in the layout at index 0
+			QLayoutItem* item = ui->voices_hlayout->itemAt(0);
+			ui->voices_hlayout->removeItem(item);
+
+			// get the widget
+			QWidget* widget = item->widget();
+
+			// check if a valid widget
+			if(widget)
+			{
+				delete widget;
+			}
+
+			// oscilloscope buffer delete
+			if(oscilloscope_buffers[i])
+				delete[] oscilloscope_buffers[i];
+		}
+	}
+}
+
 void MainWindow::OnFillAudioData(char *data, qint64 len)
 {
     float *buffer = reinterpret_cast<float*>(data);
@@ -148,9 +202,19 @@ void MainWindow::OnFillAudioData(char *data, qint64 len)
         vgm_player.GetNextSample(&sample_left, &sample_right);
         buffer[i] = sample_left;
         buffer[i+1] = sample_right;
+
+		for(int j=0; j<vgm_player.GetVoiceCount(); j++)
+		{
+			if(j < MAX_OSCILLOSCOPES)
+				oscilloscope_buffers[j][i/2] = vgm_player.GetSampleVoice(j);
+		}
     }
 
-    ui->oscilloscope->NextAudioData(reinterpret_cast<float*>(data), len / (m_format.sampleSize()/8));
+	for(int i=0; i<ui->voices_hlayout->count(); i++)
+	{
+		OscilloscopeWidget* w = (OscilloscopeWidget*)ui->voices_hlayout->itemAt(i)->widget();
+		w->NextAudioData(reinterpret_cast<float*>(oscilloscope_buffers[i]), len / (m_format.sampleSize()/8)/2);
+	}
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -158,9 +222,13 @@ void MainWindow::on_actionOpen_triggered()
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),0, tr("Video Game Music Files (*.vgm; *.vgz) (*.vgm *.vgz)"));
 
     vgm_player.SetPlay(false);
+	m_audioOutput->suspend();
+
+	ReleaseOscilloscopes();
+
     if(vgm_player.Open(fileName))
     {
-        vgm_player.SetPlay(true);
+		InitOscilloscopes(vgm_player.GetVoiceCount());
 
         LogText("- VGM Demo Datei wurde geöffnet. [" + QString::number(vgm_player.GetFileSize()) + " Bytes]");
         LogText("- EOF Offset: 0x" + QString::number(vgm_player.GetEOFOffset(),16).toUpper() + " | " + (QString::number(vgm_player.GetEOFOffset())));
@@ -181,6 +249,9 @@ void MainWindow::on_actionOpen_triggered()
         LogText("- VGM Data Offset: 0x" + QString::number(vgm_player.GetVGMDataOffset(),16));
 
 		FillGD3TagTable();
+
+		m_audioOutput->resume();
+		vgm_player.SetPlay(true);
     }
 }
 

@@ -5,7 +5,7 @@
 //                                              //
 // #file: mainwindow.h                          //
 //                                              //
-// last changes at 10-17-2022                   //
+// last changes at 11-22-2022                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -24,7 +24,9 @@
 #include <QAudioDeviceInfo>
 #include <QAudioOutput>
 
+#define SAMPLERATE 44100
 #define SOUND_BUFFER_SIZE 8192
+#define MAX_OSCILLOSCOPES 32
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -39,10 +41,11 @@ public:
     ~MainWindow();
 
 private slots:
+	void OnFillAudioData(char *data, qint64 len);
+
     void on_actionOpen_triggered();
     void on_actionE_xit_triggered();
     void on_action_Export_Streaming_Data_triggered();
-    void OnFillAudioData(char *data, qint64 len);
     void on_gb_write_reg_clicked();
 	void on_sn76489_stereo_slider_valueChanged(int value);
 	void on_sn76489_stereo_spin_valueChanged(double arg1);
@@ -55,13 +58,16 @@ private:
     void InitAudio();
     void ReleaseAudio();
 	void FillGD3TagTable();
+	void InitOscilloscopes(int count);
+	void ReleaseOscilloscopes();
 
     unsigned int bufferSize;
     QAudioDeviceInfo m_device;
     QAudioFormat     m_format;
     QByteArray       m_buffer;
     QAudioOutput    *m_audioOutput;
-
     AudioGenerator *m_audiogen;
+
+	float* oscilloscope_buffers[MAX_OSCILLOSCOPES];
 };
 #endif // MAINWINDOW_H
