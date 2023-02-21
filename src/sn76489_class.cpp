@@ -5,7 +5,7 @@
 //                                              //
 // #file: sn76489_class.cpp                     //
 //                                              //
-// last changes at 11-22-2022                   //
+// last changes at 02-21-2023                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -42,6 +42,9 @@ SN76489Class::SN76489Class()
     shift_reg = 0x8000;
 
     is_wait_second_byte = 0;
+
+	for(int i=0; i<VOICE_COUNT_SN76489; i++)
+		channel_mute[i] = false;
 }
 
 SN76489Class::~SN76489Class()
@@ -154,6 +157,9 @@ void SN76489Class::CalcNextSample()
         if(noise_counter >= 1.0f)
             StepNoiseGerator();
     }
+
+	tone1_output = 0.0f;
+	noise_output = 0.0f;
 /*
 #ifndef EMU_ATTENUATION
     return  tone1_output + tone2_output + tone3_output + noise_output;
@@ -234,6 +240,25 @@ float SN76489Class::GetSampleVoice(int voice)
 			return 0.0f;
 			break;
 		}
+}
+
+void SN76489Class::MuteChannel(int voice, bool enable)
+{
+	if(voice >= VOICE_COUNT_SN76489)
+		return;
+
+	channel_mute[voice] = enable;
+}
+
+void SN76489Class::SoloChannel(int voice)
+{
+	if(voice >= VOICE_COUNT_SN76489)
+		return;
+
+	for(int i=0; i<VOICE_COUNT_SN76489; i++)
+		channel_mute[i] = true;
+
+	channel_mute[voice] = false;
 }
 
 void SN76489Class::CalcSubCounter()

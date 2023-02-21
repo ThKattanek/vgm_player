@@ -5,7 +5,7 @@
 //                                              //
 // #file: gb_dmg_class.cpp                      //
 //                                              //
-// last changes at 11-22-2022                   //
+// last changes at 02-21-2023                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -69,6 +69,9 @@ GB_DMGClass::GB_DMGClass()
 
 	counter_frame_sequencer = 1.0f;
 	frame_sequencer = 0;
+
+	for(int i=0; i<VOICE_COUNT_GB_DMG; i++)
+		channel_mute[i] = false;
 
 	Reset();
 }
@@ -494,10 +497,10 @@ void GB_DMGClass::CalcNextSample()
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	ch1 = channel1_out * volume_out_table[channel1_current_volume & 0x0f];
-	ch2 = channel2_out * volume_out_table[channel2_current_volume & 0x0f];
-	ch3 = channel3_out * channel3_volume;
-	ch4 = channel4_out * volume_out_table[channel4_current_volume & 0x0f];
+	ch1 = (channel_mute[0]) ? 0.0f : channel1_out * volume_out_table[channel1_current_volume & 0x0f];
+	ch2 = (channel_mute[1]) ? 0.0f : channel2_out * volume_out_table[channel2_current_volume & 0x0f];
+	ch3 = (channel_mute[2]) ? 0.0f : channel3_out * channel3_volume;
+	ch4 = (channel_mute[3]) ? 0.0f : channel4_out * volume_out_table[channel4_current_volume & 0x0f];
 
 	float left_out, right_out;
 	left_out = right_out = 0.0f;
@@ -570,6 +573,25 @@ float GB_DMGClass::GetSampleVoice(int voice)
 		return 0.0f;
 		break;
 	}
+}
+
+void GB_DMGClass::MuteChannel(int voice, bool enable)
+{
+	if(voice >= VOICE_COUNT_GB_DMG)
+		return;
+
+	channel_mute[voice] = enable;
+}
+
+void GB_DMGClass::SoloChannel(int voice)
+{
+	if(voice >= VOICE_COUNT_GB_DMG)
+		return;
+
+	for(int i=0; i<VOICE_COUNT_GB_DMG; i++)
+		channel_mute[i] = true;
+
+	channel_mute[voice] = false;
 }
 
 void GB_DMGClass::Reset()
