@@ -36,7 +36,6 @@ public:
 	int GetVoiceCount();
 	float GetSampleVoice(int voice);
 	void MuteChannel(int voice, bool enable);
-	void SoloChannel(int voice);
 
 private:
     void CalcSubCounter();

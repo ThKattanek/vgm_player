@@ -184,16 +184,17 @@ void SN76489Class::SetStereoStrength(float stereo_strength)
 float SN76489Class::GetSampleLeft()
 {
 	uint8_t channels = stereo_control >> 4;
+
 	#ifndef EMU_ATTENUATION
-	return  ((channels & 0x08) ? tone1_output : tone1_output * stereo_strength) + \
-			((channels & 0x04) ? tone2_output : tone2_output * stereo_strength) + \
-			((channels & 0x02) ? tone3_output : tone3_output * stereo_strength) + \
-			((channels & 0x01) ? noise_output : noise_output * stereo_strength);
+	return  ((channel_mute[0]) ? 0.0f : ((channels & 0x08) ? tone1_output : tone1_output * stereo_strength)) + \
+			((channel_mute[1]) ? 0.0f : ((channels & 0x04) ? tone2_output : tone2_output * stereo_strength)) + \
+			((channel_mute[2]) ? 0.0f : ((channels & 0x02) ? tone3_output : tone3_output * stereo_strength)) + \
+			((channel_mute[3]) ? 0.0f : ((channels & 0x01) ? noise_output : noise_output * stereo_strength));
 	#else
-		return  ((channels & 0x08) ? tone1_output * tone1_attenuation : tone1_output * tone1_attenuation * stereo_strength) + \
-				((channels & 0x04) ? tone2_output * tone2_attenuation : tone2_output * tone2_attenuation * stereo_strength) + \
-				((channels & 0x02) ? tone3_output * tone3_attenuation : tone3_output * tone3_attenuation * stereo_strength) + \
-				((channels & 0x01) ? noise_output * noise_attenuation : noise_output * noise_attenuation * stereo_strength);
+		return  ((channel_mute[0]) ? 0.0f : ((channels & 0x08) ? tone1_output * tone1_attenuation : tone1_output * tone1_attenuation * stereo_strength)) + \
+				((channel_mute[1]) ? 0.0f : ((channels & 0x04) ? tone2_output * tone2_attenuation : tone2_output * tone2_attenuation * stereo_strength)) + \
+				((channel_mute[2]) ? 0.0f : ((channels & 0x02) ? tone3_output * tone3_attenuation : tone3_output * tone3_attenuation * stereo_strength)) + \
+				((channel_mute[3]) ? 0.0f : ((channels & 0x01) ? noise_output * noise_attenuation : noise_output * noise_attenuation * stereo_strength));
 	#endif
 }
 
@@ -201,15 +202,15 @@ float SN76489Class::GetSampleRight()
 {
 	uint8_t channels = stereo_control;
 	#ifndef EMU_ATTENUATION
-	return  ((channels & 0x08) ? tone1_output : tone1_output * stereo_strength) + \
-			((channels & 0x04) ? tone2_output : tone2_output * stereo_strength) + \
-			((channels & 0x02) ? tone3_output : tone3_output * stereo_strength) + \
-			((channels & 0x01) ? noise_output : noise_output * stereo_strength);
+	return  ((channel_mute[0]) ? 0.0f : ((channels & 0x08) ? tone1_output : tone1_output * stereo_strength)) + \
+			((channel_mute[1]) ? 0.0f : ((channels & 0x04) ? tone2_output : tone2_output * stereo_strength)) + \
+			((channel_mute[2]) ? 0.0f : ((channels & 0x02) ? tone3_output : tone3_output * stereo_strength)) + \
+			((channel_mute[3]) ? 0.0f : ((channels & 0x01) ? noise_output : noise_output * stereo_strength));
 	#else
-		return  ((channels & 0x08) ? tone1_output * tone1_attenuation : tone1_output * tone1_attenuation * stereo_strength) + \
-				((channels & 0x04) ? tone2_output * tone2_attenuation : tone2_output * tone2_attenuation * stereo_strength) + \
-				((channels & 0x02) ? tone3_output * tone3_attenuation : tone3_output * tone3_attenuation * stereo_strength) + \
-				((channels & 0x01) ? noise_output * noise_attenuation : noise_output * noise_attenuation * stereo_strength);
+		return  ((channel_mute[0]) ? 0.0f : ((channels & 0x08) ? tone1_output * tone1_attenuation : tone1_output * tone1_attenuation * stereo_strength)) + \
+				((channel_mute[1]) ? 0.0f : ((channels & 0x04) ? tone2_output * tone2_attenuation : tone2_output * tone2_attenuation * stereo_strength)) + \
+				((channel_mute[2]) ? 0.0f : ((channels & 0x02) ? tone3_output * tone3_attenuation : tone3_output * tone3_attenuation * stereo_strength)) + \
+				((channel_mute[3]) ? 0.0f : ((channels & 0x01) ? noise_output * noise_attenuation : noise_output * noise_attenuation * stereo_strength));
 #endif
 }
 
@@ -222,16 +223,16 @@ float SN76489Class::GetSampleVoice(int voice)
 {
 		switch (voice) {
 		case 0:
-			return tone1_output * tone1_attenuation;
+			return (channel_mute[0]) ? 0.0f : tone1_output * tone1_attenuation;
 			break;
 		case 1:
-			return tone2_output * tone2_attenuation;
+			return (channel_mute[1]) ? 0.0f : tone2_output * tone2_attenuation;
 			break;
 		case 2:
-			return tone3_output * tone3_attenuation;
+			return (channel_mute[2]) ? 0.0f : tone3_output * tone3_attenuation;
 			break;
 		case 3:
-			return noise_output * noise_attenuation;
+			return (channel_mute[3]) ? 0.0f : noise_output * noise_attenuation;
 			break;
 		default:
 			return 0.0f;
@@ -245,17 +246,6 @@ void SN76489Class::MuteChannel(int voice, bool enable)
 		return;
 
 	channel_mute[voice] = enable;
-}
-
-void SN76489Class::SoloChannel(int voice)
-{
-	if(voice >= VOICE_COUNT_SN76489)
-		return;
-
-	for(int i=0; i<VOICE_COUNT_SN76489; i++)
-		channel_mute[i] = true;
-
-	channel_mute[voice] = false;
 }
 
 void SN76489Class::CalcSubCounter()

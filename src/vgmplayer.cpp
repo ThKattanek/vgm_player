@@ -170,8 +170,9 @@ bool VGMPlayer::Open(QString filename)
 		if(is_GB_DMG_enable)
 			InitGBDMG();
 
-		is_file_open = true;
+		SetAllChannelsMuteOff();
 
+		is_file_open = true;
 
 	return true;
 }
@@ -432,6 +433,12 @@ void VGMPlayer::WriteGBDMGRegister(uint8_t reg_nr, uint8_t value)
 	gbdmg.WriteReg(reg_nr, value);
 }
 
+void VGMPlayer::SetAllChannelsMuteOff()
+{
+	for(int i=0; i<GetVoiceCount(); i++)
+		SetChannelMute(i, false);
+}
+
 void VGMPlayer::SetChannelMute(int voice, bool enable)
 {
 	if(current_soundchip_count > 1)
@@ -442,19 +449,6 @@ void VGMPlayer::SetChannelMute(int voice, bool enable)
 			sn76489.MuteChannel(voice, enable);
 		if(is_GB_DMG_enable)
 			gbdmg.MuteChannel(voice, enable);
-	}
-}
-
-void VGMPlayer::SetChannelSolo(int voice)
-{
-	if(current_soundchip_count > 1)
-		return;
-	else
-	{
-		if(is_SN76489_enabled)
-			sn76489.SoloChannel(voice);
-		if(is_GB_DMG_enable)
-			gbdmg.SoloChannel(voice);
 	}
 }
 

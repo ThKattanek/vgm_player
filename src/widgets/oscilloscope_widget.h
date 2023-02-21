@@ -1,9 +1,22 @@
+//////////////////////////////////////////////////
+//                                              //
+// VGM Player with QT                           //
+// by thorsten kattanek                         //
+//                                              //
+// #file: oscilloscope_widget.h                 //
+//                                              //
+// last changes at 02-21-2023                   //
+// https://github.com/ThKattanek/vgm_player     //
+//                                              //
+//////////////////////////////////////////////////
+
 #ifndef OSCILLOSCOPE_WIDGET_H
 #define OSCILLOSCOPE_WIDGET_H
 
 #include <QWidget>
 #include <QColor>
 #include <QTimer>
+#include <QMouseEvent>
 
 #define MAX_PLANES 2
 #define MAX_X_POINTS 4096
@@ -19,7 +32,7 @@ class OscilloscopeWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit OscilloscopeWidget(QWidget *parent = nullptr);
+	explicit OscilloscopeWidget(int id, QWidget *parent = nullptr);
     ~OscilloscopeWidget();
 
     void SetSamplerate(float samplerate);
@@ -43,8 +56,10 @@ public:
     void NextAudioData(float *data, int length);
 
 public slots:
-
     void OnRefresh();
+
+signals:
+	void MouseButtonPressed(int id, bool mute);
 
 private:
 	void DrawRaster(QPainter &painter, int width, int height);
@@ -54,6 +69,8 @@ private:
 
     Ui::OscilloscopeWidget *ui;
     QColor CalcFadeColor(QColor src_color, QColor dst_color, float fade);   // fade 0.0 = 100% scr_color | 1.0 = 100% dst_color
+
+	int	id;
 
     float samplerate;
 
@@ -93,8 +110,14 @@ private:
 	bool draw_data;
 	bool draw_infos;
 
+	bool disable;
+
     QTimer *timer1;
     bool refresh;
+
+	// QWidget interface
+protected:
+	void mousePressEvent(QMouseEvent *event);
 };
 
 #endif // OSCILLOSCOPE_WIDGET_H

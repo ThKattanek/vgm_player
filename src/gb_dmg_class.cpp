@@ -583,17 +583,6 @@ void GB_DMGClass::MuteChannel(int voice, bool enable)
 	channel_mute[voice] = enable;
 }
 
-void GB_DMGClass::SoloChannel(int voice)
-{
-	if(voice >= VOICE_COUNT_GB_DMG)
-		return;
-
-	for(int i=0; i<VOICE_COUNT_GB_DMG; i++)
-		channel_mute[i] = true;
-
-	channel_mute[voice] = false;
-}
-
 void GB_DMGClass::Reset()
 {
 	channel1_counter = channel2_counter = channel3_counter = channel4_counter = 0.0f;

@@ -1,14 +1,31 @@
+//////////////////////////////////////////////////
+//                                              //
+// VGM Player with QT                           //
+// by thorsten kattanek                         //
+//                                              //
+// #file: oscilloscope_widget.cpp               //
+//                                              //
+// last changes at 02-21-2023                   //
+// https://github.com/ThKattanek/vgm_player     //
+//                                              //
+//////////////////////////////////////////////////
+
 #include "oscilloscope_widget.h"
 #include "ui_oscilloscope_widget.h"
 
 #include <QPainter>
 #include <QDebug>
 
-OscilloscopeWidget::OscilloscopeWidget(QWidget *parent) :
+OscilloscopeWidget::OscilloscopeWidget(int id, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::OscilloscopeWidget)
 {
     ui->setupUi(this);
+
+	ui->mute_label->hide();
+	disable = false;
+
+	this->id = id;
 
     // default colors
     background_color.setRgb(0,120,170);
@@ -247,7 +264,22 @@ QColor OscilloscopeWidget::CalcFadeColor(QColor src_color, QColor dst_color, flo
     int g = static_cast<int>(src_color.green() + ((dst_color.green() - src_color.green()) * fade));
     int b = static_cast<int>(src_color.blue() + ((dst_color.blue() - src_color.blue()) * fade));
 
-    return QColor(r,g,b);
+	return QColor(r,g,b);
+}
+
+void OscilloscopeWidget::mousePressEvent(QMouseEvent *event)
+{
+	if(event->button() == Qt::LeftButton)
+	{
+		disable = !disable;
+
+		if(disable)
+			ui->mute_label->show();
+		else
+			ui->mute_label->hide();
+
+		emit MouseButtonPressed(id, disable);
+	}
 }
 
 void OscilloscopeWidget::SetSamplerate(float samplerate)

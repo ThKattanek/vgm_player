@@ -35,8 +35,8 @@ public:
     bool ExportStreamingData(QString filename);
 	void WriteGBDMGRegister(uint8_t reg_nr, uint8_t value);
 
+	void SetAllChannelsMuteOff();
 	void SetChannelMute(int voice, bool enable);
-	void SetChannelSolo(int voice);
 
     int64_t GetFileSize();
     uint32_t GetEOFOffset();
