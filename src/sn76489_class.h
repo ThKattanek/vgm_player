@@ -5,7 +5,7 @@
 //                                              //
 // #file: sn76489_class.h                       //
 //                                              //
-// last changes at 11-22-2022                   //
+// last changes at 02-21-2023                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -35,6 +35,7 @@ public:
 	float GetSampleRight();
 	int GetVoiceCount();
 	float GetSampleVoice(int voice);
+	void MuteChannel(int voice, bool enable);
 
 private:
     void CalcSubCounter();
@@ -75,6 +76,8 @@ private:
 
     uint16_t freq_latch;
     uint8_t is_wait_second_byte;   // 0=no / 1=yes - tone1 / 2=yes - tone2 / 3=yes - tone3
+
+	bool channel_mute[VOICE_COUNT_SN76489];
 };
 
 #endif // SN76489CLASS_H

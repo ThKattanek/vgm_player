@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.h                           //
 //                                              //
-// last changes at 11-22-2022                   //
+// last changes at 02-21-2023                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -34,6 +34,9 @@ public:
 	void Set_SN76489_StereoStrength(float stereo_strength);
     bool ExportStreamingData(QString filename);
 	void WriteGBDMGRegister(uint8_t reg_nr, uint8_t value);
+
+	void SetAllChannelsMuteOff();
+	void SetChannelMute(int voice, bool enable);
 
     int64_t GetFileSize();
     uint32_t GetEOFOffset();

@@ -5,7 +5,7 @@
 //                                              //
 // #file: mainwindow.h                          //
 //                                              //
-// last changes at 11-22-2022                   //
+// last changes at 02-21-2023                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -42,6 +42,7 @@ public:
 
 private slots:
 	void OnFillAudioData(char *data, qint64 len);
+	void OnOscilloscopeMute(int id, bool mute);
 
     void on_actionOpen_triggered();
     void on_actionE_xit_triggered();

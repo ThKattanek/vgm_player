@@ -5,7 +5,7 @@
 //                                              //
 // #file: gb_dmg_class.h                        //
 //                                              //
-// last changes at 11-22-2022                   //
+// last changes at 02-21-2023                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -32,6 +32,7 @@ public:
 	float GetSampleRight();
 	int GetVoiceCount();
 	float GetSampleVoice(int voice);
+	void MuteChannel(int voice, bool enable);
 
 private:
     void CalcSubCounter();
@@ -140,6 +141,8 @@ private:
 	///////////////////////////////////////////////////////
 
 	float ch1, ch2, ch3, ch4;
+
+	bool  channel_mute[VOICE_COUNT_GB_DMG];
 
 	float sample_left_out;
 	float sample_right_out;

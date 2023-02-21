@@ -5,7 +5,7 @@
 //                                              //
 // #file: mainwindow.cpp                        //
 //                                              //
-// last changes at 11-22-2022                   //
+// last changes at 02-21-2023                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -140,7 +140,7 @@ void MainWindow::InitOscilloscopes(int count)
 	{
 		if(i < MAX_OSCILLOSCOPES)
 		{
-			OscilloscopeWidget* w = new OscilloscopeWidget();
+			OscilloscopeWidget* w = new OscilloscopeWidget(i);
 
 			w->setFixedSize(80, 64);
 			w->SetSamplerate(SAMPLERATE);
@@ -159,6 +159,8 @@ void MainWindow::InitOscilloscopes(int count)
 			ui->voices_hlayout->addWidget(w);
 
 			oscilloscope_buffers[i] = new float[bufferSize];
+
+			connect(w, SIGNAL(MouseButtonPressed(int,bool)), this, SLOT(OnOscilloscopeMute(int,bool)));
 		}
 	}
 }
@@ -176,12 +178,13 @@ void MainWindow::ReleaseOscilloscopes()
 			ui->voices_hlayout->removeItem(item);
 
 			// get the widget
-			QWidget* widget = item->widget();
+			QWidget* w = item->widget();
 
 			// check if a valid widget
-			if(widget)
+			if(w)
 			{
-				delete widget;
+				connect(w, SIGNAL(MouseButtonPressed(int,bool)), this, SLOT(OnOscilloscopeMute(int,bool)));
+				delete w;
 			}
 
 			// oscilloscope buffer delete
@@ -215,6 +218,11 @@ void MainWindow::OnFillAudioData(char *data, qint64 len)
 		OscilloscopeWidget* w = (OscilloscopeWidget*)ui->voices_hlayout->itemAt(i)->widget();
 		w->NextAudioData(reinterpret_cast<float*>(oscilloscope_buffers[i]), len / (m_format.sampleSize()/8)/2);
 	}
+}
+
+void MainWindow::OnOscilloscopeMute(int id, bool mute)
+{
+	vgm_player.SetChannelMute(id, mute);
 }
 
 void MainWindow::on_actionOpen_triggered()
