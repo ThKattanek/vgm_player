@@ -20,6 +20,8 @@
 #include "./audiogenerator.h"
 #include "./vgmplayer.h"
 
+#include "./about_window.h"
+
 #include <QAudioFormat>
 #include <QAudioDeviceInfo>
 #include <QAudioOutput>
@@ -57,8 +59,12 @@ private slots:
 
 	void on_stop_button_clicked();
 
+	void on_action_About_triggered();
+
 private:
     Ui::MainWindow *ui;
+
+	AboutWindow* about_window;
 
     VGMPlayer vgm_player;
     void LogText(const QString text);
