@@ -29,7 +29,9 @@ MainWindow::MainWindow(QWidget *parent)
 	for(int i=0; i<7; i++)
 		ui->gd3_tag_table->setItem(i,0, new QTableWidgetItem());
 
-    this->setWindowTitle("VGM Player - by Thorsten Kattanek");
+	this->setWindowTitle("VGM Player");
+
+	ui->statusbar->setStatusTip("sss");
 
 	setGeometry( QStyle::alignedRect( Qt::LeftToRight, Qt::AlignCenter,size(),  qApp->desktop()->availableGeometry()));
 
@@ -40,10 +42,15 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->sn76489_stereo_slider->setValue(75);
 
 	// Hide DevTools
+#ifndef QT_DEBUG
 	ui->gb_gmd_group->hide();
 	ui->sn76489_group->hide();
+	ui->log_output->hide();
+#endif
 
     InitAudio();
+
+
 }
 
 MainWindow::~MainWindow()
@@ -316,5 +323,15 @@ void MainWindow::on_pause_button_clicked()
 void MainWindow::on_stop_button_clicked()
 {
 	vgm_player.Stop();
+}
+
+
+void MainWindow::on_action_About_triggered()
+{
+	about_window = new AboutWindow(this);
+
+	about_window->exec();
+
+	delete about_window;
 }
 

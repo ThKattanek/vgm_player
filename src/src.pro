@@ -24,7 +24,29 @@ DEFINES += QT_DEPRECATED_WARNINGS
 TARGET = vgm-player
 TEMPLATE = app
 
+VGM_PLAYER_VERSION = 0.1.0
+
+# Versionsnummer ermitteln aus Git Tag Nummer
+GIT_VERSION = $$system(git --git-dir \"../.git\" describe --always --tags)
+isEmpty(GIT_VERSION) {
+  GIT_VERSION = $$VGM_PLAYER_VERSION
+}
+DEFINES += VERSION_STRING=\\\"$$GIT_VERSION\\\"
+
+message("VGM Player Version: " $$GIT_VERSION)
+
+contains(QT_ARCH, x86_64){
+    EMU64_ARCH = 64Bit
+} else:contains(QT_ARCH, i[3456]86) {
+    EMU64_ARCH = 32Bit
+} else {
+    EMU64_ARCH = Unknown
+}
+
+DEFINES += ARCHITECTURE_STRING=\\\"$$EMU64_ARCH\\\"
+
 SOURCES += \
+    about_window.cpp \
     gb_dmg_class.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -35,6 +57,7 @@ SOURCES += \
     widgets/oscilloscope_widget.cpp
 
 HEADERS += \
+    about_window.h \
     gb_dmg_class.h \
     mainwindow.h \
     sn76489_class.h \
@@ -44,6 +67,7 @@ HEADERS += \
     widgets/oscilloscope_widget.h
 
 FORMS += \
+    about_window.ui \
     mainwindow.ui \
     widgets/oscilloscope_widget.ui
 
