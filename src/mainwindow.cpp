@@ -27,7 +27,9 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->gd3_tag_table->setColumnWidth(0,500);
 
 	for(int i=0; i<7; i++)
+	{
 		ui->gd3_tag_table->setItem(i,0, new QTableWidgetItem());
+	}
 
 	this->setWindowTitle("VGM Player");
 

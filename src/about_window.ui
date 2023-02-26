@@ -37,7 +37,7 @@
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-image: url(:/logo/images/vgm_plyer_logo_256.png);</string>
+        <string notr="true">background-image: url(:/logo/images/vgm_player_logo_256.png);</string>
        </property>
       </widget>
      </item>

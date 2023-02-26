@@ -79,6 +79,8 @@ FORMS += \
 RESOURCES += \
     vgm_player.qrc
 
+RC_FILE += vgm_player.rc
+
 # Installation
 
 message(Installpath: $$PREFIX)
