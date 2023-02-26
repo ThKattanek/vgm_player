@@ -4,4 +4,7 @@
         <file>images/Play_24x24.png</file>
         <file>images/Stop_24x24.png</file>
     </qresource>
+    <qresource prefix="/logo">
+        <file>images/vgm_plyer_logo_256.png</file>
+    </qresource>
 </RCC>
