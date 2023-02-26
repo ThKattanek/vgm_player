@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.cpp                         //
 //                                              //
-// last changes at 02-21-2023                   //
+// last changes at 02-26-2023                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -299,6 +299,12 @@ void VGMPlayer::SetPlay(bool playing)
             sample_counter = 0;
         }
 	}
+}
+
+void VGMPlayer::Stop()
+{
+	is_analyze = is_playing = false;
+	streaming_pos = 0;
 }
 
 void VGMPlayer::Set_SN76489_StereoStrength(float stereo_strength)
@@ -648,6 +654,7 @@ void VGMPlayer::ExecuteNextStreamCommand()
     // 0x66       : end of sound data
     case 0x66:
         is_analyze = is_playing = false;
+		streaming_pos = 0;
         break;
     // 0x67 ...   : data block: see below
     case 0x67:
@@ -822,7 +829,7 @@ void VGMPlayer::AnalyzingStreamForSoundchips()
     is_analyze = true;
     streaming_pos = 0;
 
-    while(is_analyze || streaming_pos < streaming_data_length)
+	while(is_analyze && (streaming_pos < streaming_data_length))
     {
         ExecuteNextStreamCommand();
     }

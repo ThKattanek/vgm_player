@@ -51,6 +51,12 @@ private slots:
 	void on_sn76489_stereo_slider_valueChanged(int value);
 	void on_sn76489_stereo_spin_valueChanged(double arg1);
 
+	void on_play_button_clicked();
+
+	void on_pause_button_clicked();
+
+	void on_stop_button_clicked();
+
 private:
     Ui::MainWindow *ui;
 

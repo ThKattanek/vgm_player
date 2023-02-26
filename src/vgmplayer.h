@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.h                           //
 //                                              //
-// last changes at 02-21-2023                   //
+// last changes at 02-26-2023                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -31,6 +31,7 @@ public:
 	int GetVoiceCount();
 	float GetSampleVoice(int voice);
     void SetPlay(bool playing);
+	void Stop();
 	void Set_SN76489_StereoStrength(float stereo_strength);
     bool ExportStreamingData(QString filename);
 	void WriteGBDMGRegister(uint8_t reg_nr, uint8_t value);

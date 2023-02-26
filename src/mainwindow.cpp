@@ -5,7 +5,7 @@
 //                                              //
 // #file: mainwindow.cpp                        //
 //                                              //
-// last changes at 02-21-2023                   //
+// last changes at 02-26-2023                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -259,7 +259,7 @@ void MainWindow::on_actionOpen_triggered()
 		FillGD3TagTable();
 
 		m_audioOutput->resume();
-		vgm_player.SetPlay(true);
+		//vgm_player.SetPlay(true);
     }
 }
 
@@ -298,5 +298,23 @@ void MainWindow::on_sn76489_stereo_spin_valueChanged(double value)
 {
 	ui->sn76489_stereo_slider->setValue(value);
 	vgm_player.Set_SN76489_StereoStrength((100-value)/100.0f);
+}
+
+
+void MainWindow::on_play_button_clicked()
+{
+	vgm_player.SetPlay(true);
+}
+
+
+void MainWindow::on_pause_button_clicked()
+{
+	vgm_player.SetPlay(false);
+}
+
+
+void MainWindow::on_stop_button_clicked()
+{
+	vgm_player.Stop();
 }
 
