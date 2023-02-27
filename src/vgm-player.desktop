@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=VGM Player
+Comment=This is a "Video Game Music" player with qt
+Comment[de]=Ein Video Game Musik Player
+Icon=vgm-player
+TryExec=vgm-player
+Exec=vgm-player %f
+Categories=AudioVideo;

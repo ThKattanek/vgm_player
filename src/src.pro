@@ -92,6 +92,8 @@ win32 {
 } else {
     target.path = $$PREFIX/bin
     vgm-files.path = $$PREFIX/share/$$TARGET/vgm-files
+    desktop.path = $$PREFIX/share/applications
+    icons.path = $$PREFIX/share/icons/hicolor/64x64/apps
 }
 
 # VGM Demo Files
@@ -99,4 +101,15 @@ vgm-files.CONFIG += nostrip
 vgm-files.files += "../vgm-files/sms"
 vgm-files.files += "../vgm-files/gameboy"
 
-INSTALLS += target vgm-files
+# Linux Install Startmenü Eintrag
+## /usr/local/share/icons/hicolor/64x64/apps/
+linux
+{
+    desktop.CONFIG += nostrip
+    desktop.files += vgm-player.desktop
+
+    icons.CONFIG += nostrip
+    icons.files += images/vgm-player.png
+}
+
+INSTALLS += target vgm-files desktop icons
