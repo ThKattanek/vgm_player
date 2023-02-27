@@ -4,7 +4,7 @@
 
 ### Supports Systems
 - Nintendo Game Boy
-- Sega Master System
+- Sega Master System / Game Gear
 
 ### Other systems will follow.
 
