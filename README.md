@@ -3,8 +3,8 @@
 ### This is a "Video Game Music" player with Qt5.
 
 ### Supports Systems
-- Nintendo Gameboy
-- Sega Mastersystem
+- Nintendo Game Boy
+- Sega Master System
 
 ### Other systems will follow.
 
