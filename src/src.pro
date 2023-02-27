@@ -50,6 +50,7 @@ SOURCES += \
     gb_dmg_class.cpp \
     main.cpp \
     mainwindow.cpp \
+    nes_apu_class.cpp \
     sn76489_class.cpp \
     vgmplayer.cpp \
     ym2612_class.cpp \
@@ -60,6 +61,7 @@ HEADERS += \
     about_window.h \
     gb_dmg_class.h \
     mainwindow.h \
+    nes_apu_class.h \
     sn76489_class.h \
     vgmplayer.h \
     ym2612_class.h \

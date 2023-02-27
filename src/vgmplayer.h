@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.h                           //
 //                                              //
-// last changes at 02-26-2023                   //
+// last changes at 02-27-2023                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,6 +18,7 @@
 #include "./sn76489_class.h"
 #include "./ym2612_class.h"
 #include "./gb_dmg_class.h"
+#include "./nes_apu_class.h"
 
 class VGMPlayer
 {
