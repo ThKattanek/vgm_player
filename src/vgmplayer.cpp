@@ -194,6 +194,7 @@ void VGMPlayer::SetSampleRate(uint32_t samplerate)
     sn76489.SetSampleRate(samplerate);
     ym2612.SetSampleRate(samplerate);
     gbdmg.SetSampleRate(samplerate);
+	nesapu.SetSampleRate(samplerate);
 }
 
 void VGMPlayer::GetNextSample(float *sample_left, float *sample_right)
@@ -238,6 +239,13 @@ void VGMPlayer::GetNextSample(float *sample_left, float *sample_right)
 			current_left_output_sample += gbdmg.GetSampleLeft();
 			current_right_output_sample += gbdmg.GetSampleRight();
         }
+
+		if(is_NES_APU_enable)
+		{
+			nesapu.CalcNextSample();
+			current_left_output_sample += nesapu.GetSampleLeft();
+			current_right_output_sample += nesapu.GetSampleRight();
+		}
 
         if(current_soundchip_count > 0)
         {
@@ -290,6 +298,8 @@ float VGMPlayer::GetSampleVoice(int voice)
 				return sn76489.GetSampleVoice(voice);
 			if(is_GB_DMG_enable)
 				return gbdmg.GetSampleVoice(voice);
+			if(is_NES_APU_enable)
+				return nesapu.GetSampleVoice(voice);
 		}
 	}
 
@@ -463,6 +473,8 @@ void VGMPlayer::SetChannelMute(int voice, bool enable)
 			sn76489.MuteChannel(voice, enable);
 		if(is_GB_DMG_enable)
 			gbdmg.MuteChannel(voice, enable);
+		if(is_NES_APU_enable)
+			nesapu.MuteChannel(voice, enable);
 	}
 }
 
@@ -730,7 +742,7 @@ void VGMPlayer::ExecuteNextStreamCommand()
 		nesapu.WriteReg(streaming_data[streaming_pos], streaming_data[streaming_pos+1]);
         streaming_pos += 2;
 		is_NES_APU_written = true;
-		//qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
+		qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xB5 aa dd : MultiPCM, write value dd to register aa
     case 0xb5:

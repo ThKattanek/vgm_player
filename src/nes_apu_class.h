@@ -32,6 +32,21 @@ public:
 	int GetVoiceCount();
 	float GetSampleVoice(int voice);
 	void MuteChannel(int voice, bool enable);
+
+private:
+	void CalcSubCounter();
+
+	uint32_t clockspeed;        // as Hz
+	uint32_t samplerate;        // as Hz
+
+	///////////////////////////////////////////////////////
+
+	float ch1, ch2, ch3, ch4, ch5;
+
+	bool  channel_mute[VOICE_COUNT_NES_APU];
+
+	float sample_left_out;
+	float sample_right_out;
 };
 
 #endif // NES_APUCLASS_H
