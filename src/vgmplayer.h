@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.h                           //
 //                                              //
-// last changes at 02-27-2023                   //
+// last changes at 02-28-2023                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -79,6 +79,7 @@ private:
     void InitSN76489();
     void InitYM2612();
     void InitGBDMG();
+	void InitNESAPU();
 
 	QFile   file;
     bool    is_file_open;
@@ -111,6 +112,7 @@ private:
     uint32_t ym2612_clock;
     uint32_t ym2151_clock;
     uint32_t gb_dmg_clock;
+	uint32_t nes_apu_clock;
     uint32_t vgm_data_offset;
 
     uint8_t *streaming_data;
@@ -120,16 +122,19 @@ private:
     bool    is_SN76489_written;
     bool    is_YM2612_written;
     bool    is_GB_DMG_written;
+	bool	is_NES_APU_written;
 
     bool    is_SN76489_enabled;
     bool    is_YM2612_enable;
     bool    is_GB_DMG_enable;
+	bool	is_NES_APU_enable;
 
     int     current_soundchip_count;
 
     SN76489Class sn76489;
     YM2612Class ym2612;
     GB_DMGClass gbdmg;
+	NES_APUClass nesapu;
 };
 
 #endif // VGMPLAYER_H

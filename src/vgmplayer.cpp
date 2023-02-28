@@ -5,7 +5,7 @@
 //                                              //
 // #file: vgmplayer.cpp                         //
 //                                              //
-// last changes at 02-26-2023                   //
+// last changes at 02-28-2023                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -123,6 +123,9 @@ bool VGMPlayer::Open(QString filename)
 			// GameBoy DMG Clock
 			gzseek(file, 0x80, SEEK_SET);
 			nbytes = gzread(file, reinterpret_cast<char*>(&gb_dmg_clock), 4);
+
+			// NES APU Clock
+			nbytes = gzread(file, reinterpret_cast<char*>(&nes_apu_clock), 4);
 		}
 
 		gzseek(file, vgm_data_offset, SEEK_SET);
@@ -169,6 +172,8 @@ bool VGMPlayer::Open(QString filename)
 			InitYM2612();
 		if(is_GB_DMG_enable)
 			InitGBDMG();
+		if(is_NES_APU_enable)
+			InitNESAPU();
 
 		SetAllChannelsMuteOff();
 
@@ -266,6 +271,9 @@ int VGMPlayer::GetVoiceCount()
 
 		if(is_GB_DMG_enable)
 			return gbdmg.GetVoiceCount();
+
+		if(is_NES_APU_enable)
+			return nesapu.GetVoiceCount();
 	}
 	return 0;
 }
@@ -719,8 +727,10 @@ void VGMPlayer::ExecuteNextStreamCommand()
         break;
     // 0xB4 aa dd : NES APU, write value dd to register aa
     case 0xb4:
+		nesapu.WriteReg(streaming_data[streaming_pos], streaming_data[streaming_pos+1]);
         streaming_pos += 2;
-        qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
+		is_NES_APU_written = true;
+		//qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xB5 aa dd : MultiPCM, write value dd to register aa
     case 0xb5:
@@ -823,6 +833,7 @@ void VGMPlayer::AnalyzingStreamForSoundchips()
     is_SN76489_enabled = is_SN76489_written = false;
     is_YM2612_enable = is_YM2612_written = false;
     is_GB_DMG_enable = is_GB_DMG_written = false;
+	is_NES_APU_enable = is_NES_APU_written = false;
 
     current_soundchip_count = 0;
 
@@ -852,6 +863,12 @@ void VGMPlayer::AnalyzingStreamForSoundchips()
         current_soundchip_count++;
     }
 
+	if(is_NES_APU_written)
+	{
+		is_NES_APU_enable = true;
+		current_soundchip_count++;
+	}
+
 	if(current_soundchip_count > 1)
 		qDebug() << "This VGM File has more as one sound chips!";
 }
@@ -874,4 +891,11 @@ void VGMPlayer::InitGBDMG()
     gbdmg.SetClockSpeed(gb_dmg_clock);
 	gbdmg.SetSampleRate(samplerate);
 	gbdmg.Reset();
+}
+
+void VGMPlayer::InitNESAPU()
+{
+	nesapu.SetClockSpeed(nes_apu_clock);
+	nesapu.SetSampleRate(samplerate);
+	nesapu.Reset();
 }
