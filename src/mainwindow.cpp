@@ -263,6 +263,7 @@ void MainWindow::on_actionOpen_triggered()
         LogText("- YM2612 Clock: " + QString::number(vgm_player.GetYM2612Clock()) + " Hz");
         LogText("- YM2151 Clock: " + QString::number(vgm_player.GetYM2151Clock()) + " Hz");
         LogText("- GameBoy DMG Clock: " + QString::number(vgm_player.GetGB_DMGClock()) + " Hz");
+        LogText("- NES APU Clock: " + QString::number(vgm_player.GetNES_APUClock()) + " Hz");
         LogText("- VGM Data Offset: 0x" + QString::number(vgm_player.GetVGMDataOffset(),16));
 
 		FillGD3TagTable();
