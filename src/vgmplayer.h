@@ -57,6 +57,7 @@ public:
     uint32_t GetYM2151Clock();
     uint32_t GetVGMDataOffset();
     uint32_t GetGB_DMGClock();
+    uint32_t GetNES_APUClock();
     uint32_t GetCurrentSamplesCount();
     uint32_t GetStreamingPos();
 

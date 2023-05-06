@@ -442,6 +442,11 @@ uint32_t VGMPlayer::GetGB_DMGClock()
     return gb_dmg_clock;
 }
 
+uint32_t VGMPlayer::GetNES_APUClock()
+{
+    return nes_apu_clock;
+}
+
 uint32_t VGMPlayer::GetCurrentSamplesCount()
 {
     return sample_counter;
@@ -742,7 +747,6 @@ void VGMPlayer::ExecuteNextStreamCommand()
 		nesapu.WriteReg(streaming_data[streaming_pos], streaming_data[streaming_pos+1]);
         streaming_pos += 2;
 		is_NES_APU_written = true;
-		qDebug() << "Command 0x" << QString::number(command,16) << " - not supported.";
         break;
     // 0xB5 aa dd : MultiPCM, write value dd to register aa
     case 0xb5:
