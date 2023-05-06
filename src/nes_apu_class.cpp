@@ -48,6 +48,9 @@ void NES_APUClass::Reset()
 
     /// Intern Counters
     counter_ch1 = counter_ch2 = 0;
+    counter_reload_ch1 = counter_reload_ch2 = 1;
+
+    volume_ch1 = volume_ch2 = 0.0f;
 
     counter_frame_sequencer = 1.0f;
 }
@@ -58,6 +61,12 @@ void NES_APUClass::WriteReg(uint8_t reg_nr, uint8_t value)
     {
     case 0x00:
         duty1 = value >> 6;
+        envelope1 = value & 0x3f;
+        if(envelope1 & 0x10)
+            volume_ch1 = ((envelope1 & 0x0f) / 15.0f) * 0.25f;
+        else
+            volume_ch1 = 0.0f;
+        qDebug() << "Write 0x4000 - 0x" << Qt::hex << envelope1;
         break;
     case 0x02:
         rct1 = (rct1 & 0xff00) | value;
@@ -70,6 +79,12 @@ void NES_APUClass::WriteReg(uint8_t reg_nr, uint8_t value)
         break;
     case 0x04:
         duty2 = value >> 6;
+        envelope2 = value & 0x3f;
+        if(envelope2 & 0x10)
+            volume_ch2 = ((envelope2 & 0x0f) / 15.0f) * 0.25f;
+        else
+            volume_ch2 = 0.0f;
+        qDebug() << "Write 0x4004 - 0x" << Qt::hex << envelope2;
         break;
     case 0x06:
         rct2 = (rct2 & 0xff00) | value;
@@ -84,7 +99,6 @@ void NES_APUClass::WriteReg(uint8_t reg_nr, uint8_t value)
         low_frequency_timer_control = value;
         counter_frame_sequencer = 1.0f;
         frame_div_counter = 0;
-        qDebug() << "Write 0x4017 - 0x" << Qt::hex << value;
         break;
     default:
         break;
@@ -99,7 +113,7 @@ void NES_APUClass::CalcNextSample()
         counter_ch1 += counter_reload_ch1;
 
         if(square_duty_table[duty1] & (1 << (sequencer_counter_ch1)))
-            ch1 = 0.30f;
+            ch1 = volume_ch1;
         else
             ch1 = 0.0f;
 
@@ -113,7 +127,7 @@ void NES_APUClass::CalcNextSample()
         counter_ch2 += counter_reload_ch2;
 
         if(square_duty_table[duty2] & (1 << (sequencer_counter_ch2)))
-            ch2 = 0.30f;
+            ch2 = volume_ch2;
         else
             ch2 = 0.0f;
 

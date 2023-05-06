@@ -46,10 +46,12 @@ private:
     //// Register ////
     //// Low frequency timer control
     uint8_t duty1, duty2;
+    uint8_t envelope1, envelope2;
     uint16_t rct1, rct2;
     uint8_t low_frequency_timer_control;
 
     uint8_t square_duty_table[4];
+    float volume_ch1, volume_ch2;
 
 	///////////////////////////////////////////////////////
 
