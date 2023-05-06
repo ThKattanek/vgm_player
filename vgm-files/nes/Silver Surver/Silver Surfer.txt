@@ -1,0 +1,39 @@
+***********************************************
+* VGM music package                           *
+* http://vgm.mdscene.net/                     *
+***********************************************
+Game name:           Silver Surfer
+System:              Nintendo Entertainment
+                     System / Famicom
+Music hardware:      NES APU (N2A03)
+
+Music author:        Tim Follin, Geoff Follin
+Game developer:      Software Creations
+Game publisher:      Arcadia Systems
+Game release date:   1990-11
+
+Package created by:  GTheGuardian
+Package version:     1.00
+
+Song list, in approximate game order:
+Song name                           Length:
+                                    Total  Loop
+01 Title                            1:39   1:29
+02 Introduction                     0:32   -
+03 Section Start                    0:08   -
+04 Section BGM 1                    1:26   1:26
+05 Section BGM 2                    1:39   1:39
+06 Section Completed                0:06   -
+07 Ending                           0:29   0:29
+08 Game Over                        0:08   -
+09 Ranking                          1:13   1:12
+
+Total Length                        7:20  13:35
+
+
+Notes:
+This pack was made using MESS 0.148 VGM mod.
+
+
+Package history:
+1.00 2013-12-20 GTheGuardian: Initial release.
