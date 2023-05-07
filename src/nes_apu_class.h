@@ -5,7 +5,7 @@
 //                                              //
 // #file: nes_apu_class.h                       //
 //                                              //
-// last changes at 05-05-2023                   //
+// last changes at 07-05-2023                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////

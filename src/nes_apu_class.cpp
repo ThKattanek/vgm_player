@@ -5,7 +5,7 @@
 //                                              //
 // #file: nes_apu_class.cpp                     //
 //                                              //
-// last changes at 05-05-2023                   //
+// last changes at 07-05-2023                   //
 // https://github.com/ThKattanek/vgm_player     //
 //                                              //
 //////////////////////////////////////////////////
@@ -107,6 +107,7 @@ void NES_APUClass::WriteReg(uint8_t reg_nr, uint8_t value)
 
 void NES_APUClass::CalcNextSample()
 {
+    // Channel 1 Square
     counter_ch1 -= sub_counter_ch1;
     if(counter_ch1 <= 0.0f)
     {
@@ -121,6 +122,7 @@ void NES_APUClass::CalcNextSample()
         sequencer_counter_ch1 &= 0x07;
     }
 
+    // Channel 2 Square
     counter_ch2 -= sub_counter_ch2;
     if(counter_ch2 <= 0.0f)
     {
