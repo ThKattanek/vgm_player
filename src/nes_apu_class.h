@@ -51,6 +51,7 @@ private:
     uint8_t low_frequency_timer_control;
 
     uint8_t square_duty_table[4];
+    uint8_t lenght_index_table[32];
     float volume_ch1, volume_ch2;
 
 	///////////////////////////////////////////////////////
@@ -62,15 +63,33 @@ private:
 	float sample_left_out;
 	float sample_right_out;
 
+    bool enable_crt_length_ch1;
     float counter_ch1;
     float counter_reload_ch1;
     float sub_counter_ch1;
     uint8_t sequencer_counter_ch1;
+    uint8_t length_reload_counter_ch1;
+    uint8_t length_counter_ch1;
+    bool enable_lenght_counter_ch1;
 
+    bool enable_crt_length_ch2;
     float counter_ch2;
     float counter_reload_ch2;
     float sub_counter_ch2;
     uint8_t sequencer_counter_ch2;
+    uint8_t length_reload_counter_ch2;
+    uint8_t length_counter_ch2;
+    bool enable_lenght_counter_ch2;
+
+    bool enable_crt_length_ch3;
+    uint8_t length_reload_counter_ch3;
+    uint8_t length_counter_ch3;
+    bool enable_lenght_counter_ch3;
+
+    bool enable_crt_length_ch4;
+    uint8_t length_reload_counter_ch4;
+    uint8_t length_counter_ch4;
+    bool enable_lenght_counter_ch4;
 
     float sub_counter_frame_sequencer;
     float counter_frame_sequencer;
